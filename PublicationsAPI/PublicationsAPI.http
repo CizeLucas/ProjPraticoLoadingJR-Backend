@@ -1,6 +1,6 @@
-@PublicationsAPI_HostAddress = http://localhost:5130
+@PublicationsAPI_HostAddress = http://localhost:5000
 
-GET {{PublicationsAPI_HostAddress}}/weatherforecast/
+GET {{PublicationsAPI_HostAddress}}/user/
 Accept: application/json
 
 ###

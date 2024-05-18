@@ -27,7 +27,6 @@ namespace PublicationsAPI
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
