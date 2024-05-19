@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using PublicationsAPI.Data;
+using PublicationsAPI.Interfaces;
+using PublicationsAPI.Repositories;
 
 namespace PublicationsAPI
 {
@@ -13,6 +17,14 @@ namespace PublicationsAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            builder.Services.AddDbContext<AppDBContext>(options => {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
             var app = builder.Build();
 

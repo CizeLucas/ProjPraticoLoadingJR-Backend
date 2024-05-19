@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using PublicationsAPI.Models;
-using PublicationsAPI.Dto;
+using PublicationsAPI.DTO;
 
 namespace PublicationsAPI.Helper
 {
@@ -9,7 +9,7 @@ namespace PublicationsAPI.Helper
     {
         public MappingProfiles()
         {
-            CreateMap<Users, UsersDto>();
+            CreateMap<Users, UsersDTO>();
         }
 
     }
