@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PublicationsAPI.DTO;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PublicationsAPI.Controllers
 {
@@ -30,12 +31,28 @@ namespace PublicationsAPI.Controllers
             return Ok(users);
         }
 
+        [HttpGet("/checkemail")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> checkEmailAvailability([FromQuery] string emailAddress){
+
+            bool isValidEmail = new EmailAddressAttribute().IsValid(emailAddress) || string.IsNullOrEmpty(emailAddress);
+            
+            if(isValidEmail)
+                return UnprocessableEntity();
+
+            if(await _usersRepository.EmailExistsAsync(emailAddress))
+                return Conflict();
+            else
+                return Ok();
+        }
 
         [HttpGet("by-uuid/{uuid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUuid(string uuid) {
+        public async Task<IActionResult> GetByUuid([FromRoute] string uuid) {
 
             if(uuid.Length != 32)
                 return BadRequest("The UUID of the request is incorrect. It needs to have exactly 32 characters");
@@ -51,7 +68,7 @@ namespace PublicationsAPI.Controllers
         [HttpGet("by-username/{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUsername(string username) {
+        public async Task<IActionResult> GetByUsername([FromRoute] string username) {
 
             var user = await _usersRepository.GetByUsernameAsync(username);
 

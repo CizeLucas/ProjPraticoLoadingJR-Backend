@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace PublicationsAPI.DTO.User
+namespace PublicationsAPI.DTO.UserDTOs
 {
-	public class CreateNewUserDTO
+	public class UserRequest
 	{
 		//[Required]
         //[MaxLength(100)]
@@ -25,5 +25,8 @@ namespace PublicationsAPI.DTO.User
         //[MaxLength(100)]
         public string? ImageUrl { get; set; } = string.Empty;
 
+        //[Required]
+        //[MaxLength(100)]
+        public string PasswordHash { get; set; } = string.Empty;
 	}
 }

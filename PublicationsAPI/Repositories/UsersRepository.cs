@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PublicationsAPI.Data;
-using PublicationsAPI.DTO;
+using PublicationsAPI.DTO.User;
+using PublicationsAPI.DTO.Mappers;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 
@@ -18,14 +18,15 @@ namespace PublicationsAPI.Repositories
 			_context = context;
 		}
 
-        public async Task<Users> AddUserAsync(UsersDTO user)
+        public async Task<Users> AddUserAsync(UserRequestDto userDTO)
         {
-            if(user == null)
+            if(userDTO == null)
 				return null;
 
-			user.CreatetAt = DateTime.Now;
-			var userGUID = Guid.NewGuid().ToString("N"); //creates and formats the GUID
-			user.Uuid = userGUID;
+			Users user = UserMappers.ToUserRequestDto(userDTO);
+
+			user.CreatedAt = DateTime.Now;
+			user.Uuid = Guid.NewGuid().ToString("N"); //creates and formats the GUID
 
 			if(user.Username == null)
 				user.Username = user.Name.Replace(" ", "").Trim().ToLower();
@@ -37,7 +38,7 @@ namespace PublicationsAPI.Repositories
 				return null;
 			}
 
-			return await GetByUuidAsync(userGUID);
+			return await GetByUuidAsync(user.Uuid);
         }
 
         public async Task<bool> DeleteUserAsync(string uuid)
@@ -48,23 +49,33 @@ namespace PublicationsAPI.Repositories
 				return false;
 			
 			_context.Users.Remove(user);
-			return( (await _context.SaveChangesAsync()) > 0 );
+			return await _context.SaveChangesAsync() > 0 ;
         }
 
-        public async Task<ICollection<Users>> GetAllAsync()
+        public async Task<IEnumerable<LoggedOutUserDto>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync<Users>();
+			var users = await _context.Users.ToListAsync<Users>();
+			
+            return users.Select(user => user.ToLoggedOutUserDTO());
         }
 
-        public async Task<Users>? GetByUsernameAsync(string username)
+        public async Task<LoggedOutUserDto>? GetByUsernameAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+            return UserMappers.ToLoggedOutUserDTO( 
+				await _context.Users.FirstOrDefaultAsync(user => user.Username == username)
+			);
         }
 
-        public async Task<Users>? GetByUuidAsync(string uuid)
+        public async Task<LoggedOutUserDto>? GetByUuidAsync(string uuid)
         {
-            return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid);
+            return UserMappers.ToLoggedOutUserDTO( 
+				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) 
+				);
         }
+
+		public async Task<bool> EmailExistsAsync(string emailAddress){
+			return await _context.Users.AnyAsync(u => u.Email == emailAddress);
+		}
 
         public async Task<ICollection<Users>> GetPaginatedAsync(int page, int pageSize)
         {

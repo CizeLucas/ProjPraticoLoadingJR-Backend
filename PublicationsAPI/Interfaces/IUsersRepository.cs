@@ -1,25 +1,24 @@
 ﻿using System;
 using PublicationsAPI.Models;
-using PublicationsAPI.DTO;
+using PublicationsAPI.DTO.UserDTOs;
 
 namespace PublicationsAPI.Interfaces
 {
     public interface IUsersRepository
     {
-        public Task<ICollection<Users>> GetAllAsync();
+        //NOT AUTHORIZED (PUBLIC) METHODS:
+        public Task<ICollection<LoggedOutUserResponse>> GetAllAsync();
+        public Task<ICollection<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize);
+        public Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid);
+        public Task<LoggedOutUserResponse>? GetByUsernameAsync(string username);
+        public Task<bool> EmailExistsAsync(string emailAddress);
 
-        public Task<ICollection<Users>> GetPaginatedAsync(int page, int pageSize);
 
-        public Task<Users> GetByUuidAsync(string uuid);
-
-        public Task<Users>? GetByUsernameAsync(string username);
-
-        public Task<Users> AddUserAsync(UsersDTO user);
-
-        public Task<Users> UpdateUserAsync(UsersDTO user, string userUuid);
-
+        //ONLY IF USER IS AUTHORIZED METHODS:
+        public Task<LoggedInUserResponse> GetPersonalUserInfo(string uuid);
+        public Task<LoggedInUserResponse> AddUserAsync(UserRequest userDTO);
+        public Task<LoggedInUserResponse> UpdateUserAsync(UserRequest user, string userUuid);
         public Task<bool> UpdateUserPasswordAsync(string uuid, string passwordHash);
-
         public Task<bool> DeleteUserAsync(string uuid);
         
     }
