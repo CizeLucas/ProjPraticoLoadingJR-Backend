@@ -62,5 +62,18 @@ namespace PublicationsAPI.DTO.Mappers
                 ImageUrl = user.ImageUrl,
             };
         }
+
+        public static NewlyRegisteredUserResponse UsersToNewlyRegisteredUser(this Users user, String token, int expirationTimeInMinutes)
+        {
+            return new NewlyRegisteredUserResponse
+            {
+                Uuid = user.Uuid,
+                UserName = user.UserName,
+                Email = user.Email,
+                issuedAt = DateTime.UtcNow,
+                expiresIn = expirationTimeInMinutes,
+                Token = token
+            };
+        }
     }
 }

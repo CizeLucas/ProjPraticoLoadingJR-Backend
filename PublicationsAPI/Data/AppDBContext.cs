@@ -12,6 +12,30 @@ namespace PublicationsAPI.Data
             
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            List<ApplicationRole> roles = new List<ApplicationRole>
+            {
+                new ApplicationRole
+                {
+                    Id = 1,
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+
+                new ApplicationRole
+                {
+                    Id = 2,
+                    Name = "User",
+                    NormalizedName = "USER"
+                }
+            };
+
+            builder.Entity<ApplicationRole>().HasData(roles);
+
+            base.OnModelCreating(builder);
+        }
+
         //public DbSet<Users> Users { get; set; }
         public DbSet<Publications> Publications { get; set; }
     }

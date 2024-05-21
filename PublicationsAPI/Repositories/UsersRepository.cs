@@ -18,6 +18,28 @@ namespace PublicationsAPI.Repositories
 			_context = context;
 		}
 
+		
+        public async Task<IEnumerable<LoggedOutUserResponse>> GetAllAsync()
+        {
+			var users = await _context.Users.ToListAsync<Users>();
+			
+            return users.Select(user => user.UsersToLoggedOutUser());
+        }
+
+        public async Task<LoggedOutUserResponse>? GetByUsernameAsync(string UserName)
+        {
+            return UsersDTOMappers.UsersToLoggedOutUser( 
+				await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)
+			);
+        }
+
+        public async Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid)
+        {
+            return UsersDTOMappers.UsersToLoggedOutUser( 
+				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) 
+				);
+        }
+
         public async Task<LoggedInUserResponse> AddUserAsync(UserRequest userDTO)
         {
 
@@ -52,56 +74,11 @@ namespace PublicationsAPI.Repositories
 			_context.Users.Remove(user);
 			return await _context.SaveChangesAsync() > 0 ;
         }
-
-        public async Task<IEnumerable<LoggedOutUserResponse>> GetAllAsync()
-        {
-			var users = await _context.Users.ToListAsync<Users>();
-			
-            return users.Select(user => user.UsersToLoggedOutUser());
-        }
-
-        public async Task<LoggedOutUserResponse>? GetByUsernameAsync(string UserName)
-        {
-            return UsersDTOMappers.UsersToLoggedOutUser( 
-				await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)
-			);
-        }
-
-        public async Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid)
-        {
-            return UsersDTOMappers.UsersToLoggedOutUser( 
-				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) 
-				);
-        }
-
-		public async Task<bool> EmailExistsAsync(string emailAddress){
-			return await _context.Users.AnyAsync(u => u.Email == emailAddress);
-		}
-
         public async Task<IEnumerable<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize)
         {
 			var paginatedResponse = await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return paginatedResponse.Select(user => user.UsersToLoggedOutUser());
         }
-		
-        public async Task<bool> UpdateUserPasswordAsync(string uuid, string passwordHash)
-        {
-            Users user = await GetUserWithUuid(uuid);    
-		
-			if (user == null)
-				return false;
-
-			user.PasswordHash = passwordHash;
-
-			try{
-				_context.Users.Update(user);
-				await _context.SaveChangesAsync();
-			} catch(Exception){
-				return false;
-			}
-
-			return true;
-		}
 
         public async Task<LoggedInUserResponse> UpdateUserAsync(UserRequest updatedUser, string userUuid)
         {
@@ -127,12 +104,13 @@ namespace PublicationsAPI.Repositories
 			return UsersDTOMappers.UsersToLoggedInUser(await GetUserWithUuid(userUuid));
         }
 
-		public async Task<LoggedInUserResponse> GetPersonalUserInfo(string uuid){
-			throw new NotImplementedException();
-		}
-
 		private async Task<Users> GetUserWithUuid(string uuid){
 			return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) ;
+		}
+
+		// NOT (yet) USED:
+		public async Task<bool> EmailExistsAsync(string emailAddress){
+			return await _context.Users.AnyAsync(u => u.Email == emailAddress);
 		}
 
     }

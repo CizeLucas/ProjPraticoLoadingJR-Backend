@@ -6,7 +6,5 @@ namespace PublicationsAPI.Interfaces
 {
     public interface IUsersServices
     {
-
-
     }
 }

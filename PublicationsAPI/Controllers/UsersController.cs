@@ -30,23 +30,6 @@ namespace PublicationsAPI.Controllers
             return Ok(users);
         }
 
-        [HttpGet("/checkemail")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> checkEmailAvailability([FromQuery] string emailAddress){
-
-            bool isValidEmail = new EmailAddressAttribute().IsValid(emailAddress) || string.IsNullOrEmpty(emailAddress);
-            
-            if(!isValidEmail)
-                return UnprocessableEntity();
-
-            if(await _usersRepository.EmailExistsAsync(emailAddress))
-                return Conflict();
-            else
-                return Ok();
-        }
-
         [HttpGet("by-uuid/{uuid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,21 +88,6 @@ namespace PublicationsAPI.Controllers
                 return BadRequest("");
             
             return Ok(result);
-        }
-        
-        //AUTHORIZE
-        [HttpPut("/password/change")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUserPassword([FromBody] string passwordHash, [FromQuery(Name = "user-uuid")] string uuid){
-            
-            var result = await _usersRepository.UpdateUserPasswordAsync(uuid, passwordHash);
-
-            if(!result)
-                return StatusCode(500, "user password not changed due to an Internal Server Error");
-            
-            return Ok(await GetByUuid(uuid));
         }
 
         //AUTHORIZE
