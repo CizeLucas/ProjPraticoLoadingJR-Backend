@@ -1,7 +1,6 @@
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using PublicationsAPI.DTO;
+using PublicationsAPI.DTO.Mappers;
+using PublicationsAPI.DTO.UserDTOs;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 using System.ComponentModel.DataAnnotations;
@@ -22,7 +21,7 @@ namespace PublicationsAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<List<Users>>> GetAll() {
+        public async Task<ActionResult<List<LoggedOutUserResponse>>> GetAll() {
             var users = await _usersRepository.GetAllAsync();
 
             if(!users.Any()) 
@@ -39,7 +38,7 @@ namespace PublicationsAPI.Controllers
 
             bool isValidEmail = new EmailAddressAttribute().IsValid(emailAddress) || string.IsNullOrEmpty(emailAddress);
             
-            if(isValidEmail)
+            if(!isValidEmail)
                 return UnprocessableEntity();
 
             if(await _usersRepository.EmailExistsAsync(emailAddress))
@@ -52,7 +51,7 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUuid([FromRoute] string uuid) {
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUuid([FromRoute] string uuid) {
 
             if(uuid.Length != 32)
                 return BadRequest("The UUID of the request is incorrect. It needs to have exactly 32 characters");
@@ -68,7 +67,7 @@ namespace PublicationsAPI.Controllers
         [HttpGet("by-username/{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUsername([FromRoute] string username) {
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromRoute] string username) {
 
             var user = await _usersRepository.GetByUsernameAsync(username);
 
@@ -78,20 +77,19 @@ namespace PublicationsAPI.Controllers
             return Ok(user);
         }
 
-
+        //AUTHORIZE
         [HttpPost("/cadastrar")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Users>> AddUser([FromBody] UsersDTO user){
-            var result = await _usersRepository.AddUserAsync(user);
+        public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromBody] UserRequest user){ //ActionResult<UserRequest>
 
-            user.CreatetAt = DateTime.Now;
+            var result = await _usersRepository.AddUserAsync(user);
 
             if(result == null)
                 return BadRequest("A problem occured while processing the request of adding a new user.");
 
-            return CreatedAtAction(nameof(AddUser), new {uuid = user.Uuid}, result);
+            return CreatedAtAction(nameof(AddUser), new {uuid = result.Uuid}, result);
         }
 
         //AUTHORIZE
@@ -99,14 +97,14 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUser([FromBody] UsersDTO user, [FromQuery(Name = "uuid")] string uuid){
+        public async Task<ActionResult<LoggedInUserResponse>> UpdateUser([FromBody] UserRequest user, [FromQuery(Name = "uuid")] string uuid){
             
             var result = await _usersRepository.UpdateUserAsync(user, uuid);
 
             if(result == null)
                 return BadRequest("");
             
-            return Ok(await GetByUuid(uuid));
+            return Ok(result);
         }
         
         //AUTHORIZE
@@ -116,9 +114,9 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserPassword([FromBody] string passwordHash, [FromQuery(Name = "user-uuid")] string uuid){
             
-            var result = await _usersRepository.UpdateUserPasswordAsync(passwordHash, uuid);
+            var result = await _usersRepository.UpdateUserPasswordAsync(uuid, passwordHash);
 
-            if(result == false)
+            if(!result)
                 return StatusCode(500, "user password not changed due to an Internal Server Error");
             
             return Ok(await GetByUuid(uuid));

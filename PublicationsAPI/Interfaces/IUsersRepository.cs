@@ -7,8 +7,8 @@ namespace PublicationsAPI.Interfaces
     public interface IUsersRepository
     {
         //NOT AUTHORIZED (PUBLIC) METHODS:
-        public Task<ICollection<LoggedOutUserResponse>> GetAllAsync();
-        public Task<ICollection<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize);
+        public Task<IEnumerable<LoggedOutUserResponse>> GetAllAsync();
+        public Task<IEnumerable<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize);
         public Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid);
         public Task<LoggedOutUserResponse>? GetByUsernameAsync(string username);
         public Task<bool> EmailExistsAsync(string emailAddress);
@@ -20,6 +20,5 @@ namespace PublicationsAPI.Interfaces
         public Task<LoggedInUserResponse> UpdateUserAsync(UserRequest user, string userUuid);
         public Task<bool> UpdateUserPasswordAsync(string uuid, string passwordHash);
         public Task<bool> DeleteUserAsync(string uuid);
-        
     }
 }

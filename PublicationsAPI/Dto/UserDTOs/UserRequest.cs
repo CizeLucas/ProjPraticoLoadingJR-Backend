@@ -11,7 +11,7 @@ namespace PublicationsAPI.DTO.UserDTOs
 
         //[Required]
         //[MaxLength(50)]
-        public string Username { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
 
         //[Required(AllowEmptyStrings = true)]
         //[MaxLength(300)]
@@ -24,9 +24,5 @@ namespace PublicationsAPI.DTO.UserDTOs
         //[Required(AllowEmptyStrings = true)]
         //[MaxLength(100)]
         public string? ImageUrl { get; set; } = string.Empty;
-
-        //[Required]
-        //[MaxLength(100)]
-        public string PasswordHash { get; set; } = string.Empty;
 	}
 }
