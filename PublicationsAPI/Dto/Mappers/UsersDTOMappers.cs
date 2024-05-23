@@ -63,16 +63,16 @@ namespace PublicationsAPI.DTO.Mappers
             };
         }
 
-        public static NewlyRegisteredUserResponse UsersToNewlyRegisteredUser(this Users user, String token, int expirationTimeInMinutes)
+        public static NewlyLoggedInUserResponse UsersToNewlyLoggedInUserResponse(this Users user, String token, int expirationTimeInMinutes)
         {
-            return new NewlyRegisteredUserResponse
+            return new NewlyLoggedInUserResponse
             {
                 Uuid = user.Uuid,
                 UserName = user.UserName,
                 Email = user.Email,
                 issuedAt = DateTime.UtcNow,
-                expiresIn = expirationTimeInMinutes,
-                Token = token
+                expiresInMinutes = expirationTimeInMinutes,
+                Token = token,
             };
         }
     }

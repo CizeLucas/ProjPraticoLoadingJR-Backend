@@ -4,6 +4,8 @@ using PublicationsAPI.Models;
 using PublicationsAPI.DTO.AccountDto;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.DTO.Mappers;
+using PublicationsAPI.DTO.UserDTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace PublicationsAPI.Controllers
 {
@@ -14,11 +16,13 @@ namespace PublicationsAPI.Controllers
         private readonly UserManager<Users> _userManager;
         private readonly IAccountsService _accountServices;
         private readonly ITokenService _tokenService;
-        public AccountsController(UserManager<Users> userManager, IAccountsService accountsService, ITokenService tokenService)
+        private readonly SignInManager<Users> _signInManager;
+        public AccountsController(UserManager<Users> userManager, IAccountsService accountsService, ITokenService tokenService, SignInManager<Users> signInManager)
         {
             _userManager = userManager;
             _accountServices = accountsService;
             _tokenService = tokenService;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -37,7 +41,9 @@ namespace PublicationsAPI.Controllers
                 {
                     var roleResult = await _userManager.AddToRoleAsync(user, "User");
                     if(roleResult.Succeeded)
-                        return Ok(UsersDTOMappers.UsersToNewlyRegisteredUser(user, _tokenService.CreateToken(user), _tokenService.GetExpirationTimeInMinutes())); 
+                        return Ok(
+                            UsersDTOMappers.UsersToNewlyLoggedInUserResponse(user, _tokenService.CreateToken(user), _tokenService.GetExpirationTimeInMinutes())
+                        ); 
                     else
                         return StatusCode(500, roleResult.Errors);
                 }
@@ -50,6 +56,27 @@ namespace PublicationsAPI.Controllers
             {
                 return StatusCode(500, e.ToString());
             }
+        }
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login ([FromBody] LoginDto loginDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
+            
+            if(user == null)
+                return NotFound("Email does not exist");
+
+            var logInResult = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            
+            if(!logInResult.Succeeded)
+                return Unauthorized("Email and/or Password incorrect!");
+
+            return Ok(
+                UsersDTOMappers.UsersToNewlyLoggedInUserResponse(user, _tokenService.CreateToken(user), _tokenService.GetExpirationTimeInMinutes())
+            );
         }
     }
 }

@@ -36,6 +36,7 @@ namespace PublicationsAPI.Models
         [MaxLength(100)]
         public string? ImageUrl { get; set; } = string.Empty;
 
+        [Required]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         //[Required]

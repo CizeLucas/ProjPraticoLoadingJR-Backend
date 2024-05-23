@@ -25,7 +25,7 @@ namespace PublicationsAPI.Services {
             var claims = new List<Claim>{
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, user.Uuid)
+                new Claim("uuid", user.Uuid)
             };
 
             var signingCreds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
@@ -36,8 +36,8 @@ namespace PublicationsAPI.Services {
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddMinutes(expirationTimeInMinutes),
                 SigningCredentials = signingCreds,
-                Issuer = _config[""],
-                Audience = _config[""]
+                Issuer = _config["JWT:Issuer"],
+                Audience = _config["JWT:Audience"]
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -50,6 +50,10 @@ namespace PublicationsAPI.Services {
         public int GetExpirationTimeInMinutes()
         {
             return expirationTimeInMinutes;
+        }
+
+        public string GetUuidClaim() {
+            return "";
         }
     }
 }
