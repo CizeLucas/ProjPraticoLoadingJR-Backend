@@ -1,30 +1,26 @@
-﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
+using PublicationsAPI.Models;
 
-namespace PublicationsAPI.Models { 
-	public class Publications
-	{   
-        [Key]
-        [Required]
-		public int Id { get; set; } //ID auto-incremented by the DB for internal use (like pagination)
-        
+namespace PublicationsAPI.DTO.Publication
+{
+	public class LoggedInPublicationDTO
+	{
         [Required]
         [MaxLength(40)]
-		public string Uuid { get; set; } = string.Empty; //UUID V4 for publicly accessing and identifying users
+		public string Uuid { get; set; } //UUID V4 for publicly accessing and identifying users
 
         [Required]
         [MaxLength(100)]
-        public string Title { get; set; } = string.Empty; //Title of the publication
+        public string Title { get; set; } //Title of the publication
 
         [MaxLength(300)]
-		public string Description { get; set; } = string.Empty; //Description of the publication
+		public string Description { get; set; } //Description of the publication
 
         [Required]
         public int PublicationType { get; set; } //Integer for specifying publication type of the publication
 
         [MaxLength(150)]
-        public string? ImageURL { get; set; } = string.Empty; //Image url of the publication
+        public string? ImageURL { get; set; } //Image url of the publication
 
         [Required]
         public DateTime CreatedAt { get; set; } //Date of the creation of the publication
@@ -36,5 +32,5 @@ namespace PublicationsAPI.Models {
         public int? AuthorId { get; set; } //Foreing Key
         public Users? Author { get; set; } //Navigation proprierty
 
-    }
+	}
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PublicationsAPI.Data;
@@ -8,6 +9,7 @@ using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 using PublicationsAPI.Repositories;
 using PublicationsAPI.Services;
+using PublicationsAPI.Validations;
 using System.Text;
 
 namespace PublicationsAPI
@@ -63,6 +65,8 @@ namespace PublicationsAPI
 
                 options.User.RequireUniqueEmail = true;
 
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
                 
@@ -72,7 +76,7 @@ namespace PublicationsAPI
                 options.Tokens.ChangePhoneNumberTokenProvider = null;
                 options.Tokens.EmailConfirmationTokenProvider = null;
                 options.Tokens.PasswordResetTokenProvider = null;
-            }).AddEntityFrameworkStores<AppDBContext>().AddDefaultUI();
+            }).AddEntityFrameworkStores<AppDBContext>().AddUserValidator<UserValidations<Users>>().AddDefaultUI();
 
             builder.Services.Configure<Users>(options => {
                 options.EmailConfirmed = true;

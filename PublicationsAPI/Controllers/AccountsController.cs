@@ -41,15 +41,17 @@ namespace PublicationsAPI.Controllers
                 {
                     var roleResult = await _userManager.AddToRoleAsync(user, "User");
                     if(roleResult.Succeeded)
+                    {
                         return Ok(
                             UsersDTOMappers.UsersToNewlyLoggedInUserResponse(user, _tokenService.CreateToken(user), _tokenService.GetExpirationTimeInMinutes())
                         ); 
+                    }
                     else
-                        return StatusCode(500, roleResult.Errors);
+                        return BadRequest(roleResult.Errors);
                 }
                 else
                 {
-                    return StatusCode(500, createUser.Errors);
+                    return BadRequest(createUser.Errors);
                 }
                 
             } catch(Exception e)

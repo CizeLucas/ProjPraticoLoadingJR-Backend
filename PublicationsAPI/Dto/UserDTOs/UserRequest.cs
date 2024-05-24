@@ -19,7 +19,7 @@ namespace PublicationsAPI.DTO.UserDTOs
 
         //[Required]
         //[MaxLength(100)]
-        public string Email { get; set; } = string.Empty;
+        //public string Email { get; set; } = string.Empty;
 
         //[Required(AllowEmptyStrings = true)]
         //[MaxLength(100)]

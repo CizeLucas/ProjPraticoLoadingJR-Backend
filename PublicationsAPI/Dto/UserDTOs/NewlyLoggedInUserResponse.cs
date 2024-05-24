@@ -9,7 +9,7 @@ namespace PublicationsAPI.DTO.UserDTOs
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
 
-        public string Token { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty; //JWT Token
         public int expiresInMinutes { get; set; } = 0;
 		public DateTime issuedAt { get; set; }
 

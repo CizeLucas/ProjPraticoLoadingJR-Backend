@@ -14,10 +14,12 @@ namespace PublicationsAPI.DTO.Mappers
                 Name = user.Name,
                 UserName = user.UserName,
                 Bio = user.Bio,
-                Email = user.Email,
+                //Email = user.Email,
                 ImageUrl = user.ImageUrl
             };
         }
+
+        
 
         //(FOR RESPONSE) Returns a NEW UserRequest DTO based on information based from User of type Users
         public static UserRequest UsersToUserRequest(this Users user)
@@ -26,7 +28,7 @@ namespace PublicationsAPI.DTO.Mappers
                 Name = user.Name,
                 UserName = user.UserName,
                 Bio = user.Bio,
-                Email = user.Email,
+                //Email = user.Email,
                 ImageUrl = user.ImageUrl
             };
         }
@@ -44,6 +46,7 @@ namespace PublicationsAPI.DTO.Mappers
                 UserName = user.UserName,
                 Bio = user.Bio,
                 ImageUrl = user.ImageUrl,
+
             };
         }
 
@@ -55,13 +58,15 @@ namespace PublicationsAPI.DTO.Mappers
 
             return new LoggedInUserResponse{
                 Uuid = user.Uuid,
-                Email = user.Email,
                 Name = user.Name,
                 UserName = user.UserName,
                 Bio = user.Bio,
+                Email = user.Email,
                 ImageUrl = user.ImageUrl,
+                CreatedAt = user.CreatedAt
             };
         }
+
 
         public static NewlyLoggedInUserResponse UsersToNewlyLoggedInUserResponse(this Users user, String token, int expirationTimeInMinutes)
         {

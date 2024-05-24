@@ -23,7 +23,7 @@ namespace PublicationsAPI.Services {
         public string CreateToken(Users user)
         {
             var claims = new List<Claim>{
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                //new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
                 new Claim("uuid", user.Uuid)
             };

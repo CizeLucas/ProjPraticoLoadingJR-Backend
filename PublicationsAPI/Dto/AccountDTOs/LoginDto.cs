@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PublicationsAPI.DTO.UserDTOs{
+namespace PublicationsAPI.DTO.AccountDto
+{
     public class LoginDto {
 
         [Required]

@@ -7,24 +7,27 @@ using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using PublicationsAPI.Extensions;
+using PublicationsAPI.DTO.AccountDto;
+using Microsoft.AspNetCore.Identity;
 
 namespace PublicationsAPI.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/user")]
     public class UsersController : ControllerBase
     {
         public readonly IUsersRepository _usersRepository;
-        public UsersController(IUsersRepository usersRepository)
+        private readonly UserManager<Users> _userManager;
+        public UsersController(IUsersRepository usersRepository, UserManager<Users> userManager)
         {
             _usersRepository = usersRepository;
+            _userManager = userManager;
         }
 
-        [HttpGet("username/{username}")]
+        [HttpGet("username")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromRoute] string username) {
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromQuery] string username) {
 
             var user = await _usersRepository.GetByUsernameAsync(username);
 
@@ -34,33 +37,13 @@ namespace PublicationsAPI.Controllers
             return Ok(user);
         }
 
-        [Authorize]
-        [HttpGet("personaluser")]
+        [HttpGet("uuid")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoggedOutUserResponse>> Get() {
-            
-            string? uuid = User.GetUuid();
-            
-            if(string.IsNullOrEmpty(uuid))
-                return Unauthorized("Um problema com o seu token JWT foi identificado"); 
-            
-            LoggedOutUserResponse? user = await _usersRepository.GetByUuidAsync(uuid);
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUuid([FromQuery] string uuid) {
 
-            if(user == null)
-                return NotFound();
-            
-            return Ok(user);
-        }
-
-        [HttpGet("uuid/{uuid}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoggedOutUserResponse>> GetByUuid([FromRoute] string uuid) {
-
-            if(uuid.Length != 32)
+            if(String.IsNullOrEmpty(uuid) || uuid.Length != 32)
                 return BadRequest("The UUID of the request is incorrect. It needs to have exactly 32 characters");
 
             LoggedOutUserResponse? user = await _usersRepository.GetByUuidAsync(uuid);
@@ -70,7 +53,7 @@ namespace PublicationsAPI.Controllers
             return Ok(user);
         }
 
-        [HttpGet]
+        [HttpGet("getall")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -83,21 +66,43 @@ namespace PublicationsAPI.Controllers
             return Ok(users);
         }
 
+        [Authorize]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<LoggedInUserResponse>> GetUser() {
+            
+            string? uuid = User.GetUuid();
+            
+            if(string.IsNullOrEmpty(uuid))
+                return Unauthorized("Um problema com o seu token JWT foi identificado"); 
+            
+            LoggedInUserResponse? user = await _usersRepository.GetUserAsync(uuid);
+
+            if(user == null)
+                return NotFound();
+            
+            return Ok(user);
+        }
 
         [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromBody] UserRequest user){ //ActionResult<UserRequest>
+        public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromBody] UserRequest user){
+            
+            string? uuid = User.GetUuid();
 
-            var result = await _usersRepository.AddUserAsync(user);
+            var result = await _usersRepository.AddUserAsync(user, uuid);
 
             if(result == null)
                 return BadRequest("A problem occured while processing the request of adding a new user.");
 
             return CreatedAtAction(nameof(AddUser), new {uuid = result.Uuid}, result);
         }
+
 
         [Authorize]
         [HttpPut]
@@ -111,13 +116,15 @@ namespace PublicationsAPI.Controllers
 
             if(string.IsNullOrEmpty(uuid))
                 return Unauthorized("Um problema com o seu token JWT foi identificado");
+            try{
+                var result = await _usersRepository.UpdateUserAsync(user, uuid);
+                if(result == null)
+                    return BadRequest("");
+                return Ok(result);
 
-            var result = await _usersRepository.UpdateUserAsync(user, uuid);
-
-            if(result == null)
-                return BadRequest("");
-            
-            return Ok(result);
+            } catch(Exception e) {
+                return BadRequest(new { e.Message });
+            }
         }
 
         [Authorize]

@@ -5,6 +5,8 @@ using PublicationsAPI.DTO.UserDTOs;
 using PublicationsAPI.DTO.Mappers;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Identity;
 
 namespace PublicationsAPI.Repositories
 {
@@ -12,10 +14,12 @@ namespace PublicationsAPI.Repositories
 	{
 
 		private readonly AppDBContext _context;
+		private readonly UserManager<Users> _userManager;
 
-		public UsersRepository(AppDBContext context)
+		public UsersRepository(AppDBContext context, UserManager<Users> userManager)
 		{
 			_context = context;
+			_userManager = userManager;
 		}
 
 		
@@ -25,14 +29,18 @@ namespace PublicationsAPI.Repositories
 			
             return users.Select(user => user.UsersToLoggedOutUser());
         }
-
         public async Task<LoggedOutUserResponse>? GetByUsernameAsync(string UserName)
         {
             return UsersDTOMappers.UsersToLoggedOutUser( 
 				await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)
 			);
         }
-
+		public async Task<LoggedInUserResponse> GetUserAsync(string uuid) 
+		{
+			return UsersDTOMappers.UsersToLoggedInUser( 
+				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid)
+			);
+		}
         public async Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid)
         {
             return UsersDTOMappers.UsersToLoggedOutUser( 
@@ -40,39 +48,51 @@ namespace PublicationsAPI.Repositories
 				);
         }
 
-        public async Task<LoggedInUserResponse> AddUserAsync(UserRequest userDTO)
+        public async Task<LoggedInUserResponse> AddUserAsync(UserRequest userToCreate, string uuid)
         {
-
-            if(userDTO == null)
+			if(userToCreate == null)
 				return null;
 
-			Users user = UsersDTOMappers.UserRequestToUsers(userDTO);
+			if(userToCreate.UserName == null)
+				userToCreate.UserName = userToCreate.Name.Replace(" ", "").Trim().ToLower();
 
-			user.CreatedAt = DateTime.Now;
-			user.Uuid = Guid.NewGuid().ToString("N"); //creates and formats the GUID
+			Users? user = await _userManager.FindByIdAsync(uuid);
 
-			if(user.UserName == null)
-				user.UserName = user.Name.Replace(" ", "").Trim().ToLower();
-
-			try{
-				_context.Users.Update(user);
-				await _context.SaveChangesAsync();
-			}catch(Exception){
+			if(user == null)
 				return null;
+
+			user.Name = userToCreate.Name;
+			user.UserName = userToCreate.UserName;
+			user.Bio = userToCreate.Bio;
+			user.ImageUrl = userToCreate.ImageUrl;
+
+			var createResult = await _userManager.UpdateAsync(user);
+            
+			if (!createResult.Succeeded)
+			{
+				var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+				throw new Exception($"Failed to update user: {errors}");
 			}
 
-			return UsersDTOMappers.UsersToLoggedInUser(await GetUserWithUuid(user.Uuid));
+			return UsersDTOMappers.UsersToLoggedInUser(await _userManager.FindByIdAsync(uuid));
         }
 
         public async Task<bool> DeleteUserAsync(string uuid)
         {
-            Users user = await GetUserWithUuid(uuid);
+            Users? user = await _userManager.FindByIdAsync(uuid);
 
 			if(user == null)
 				return false;
 			
-			_context.Users.Remove(user);
-			return await _context.SaveChangesAsync() > 0 ;
+			var deleteResult = await _userManager.DeleteAsync(user);
+			
+			if (!deleteResult.Succeeded)
+			{
+				var errors = string.Join(", ", deleteResult.Errors.Select(e => e.Description));
+				throw new Exception($"Failed to update user: {errors}");
+			}
+
+			return deleteResult.Succeeded;
         }
         public async Task<IEnumerable<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize)
         {
@@ -82,36 +102,26 @@ namespace PublicationsAPI.Repositories
 
         public async Task<LoggedInUserResponse> UpdateUserAsync(UserRequest updatedUser, string userUuid)
         {
-            Users user = await GetUserWithUuid(userUuid);
+            Users? user = await _userManager.FindByIdAsync(userUuid);
 
 			if (user == null)
 				return null;
-
 			
 			user.Name = updatedUser.Name;
 			user.UserName = updatedUser.UserName;
 			user.Bio = updatedUser.Bio;
-			user.Email = updatedUser.Email;
 			user.ImageUrl = updatedUser.ImageUrl;
 
-			try{
-				_context.Users.Update(user);
-				await _context.SaveChangesAsync();
-			}catch(Exception){
-				return null;
+			var updateResult = await _userManager.UpdateAsync(user);
+
+			if (!updateResult.Succeeded)
+			{
+				var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+				throw new Exception($"Failed to update user: {errors}");
 			}
 			
-			return UsersDTOMappers.UsersToLoggedInUser(await GetUserWithUuid(userUuid));
+			return UsersDTOMappers.UsersToLoggedInUser(await _userManager.FindByIdAsync(userUuid));
         }
-
-		private async Task<Users> GetUserWithUuid(string uuid){
-			return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) ;
-		}
-
-		// NOT (yet) USED:
-		public async Task<bool> EmailExistsAsync(string emailAddress){
-			return await _context.Users.AnyAsync(u => u.Email == emailAddress);
-		}
 
     }
 }
