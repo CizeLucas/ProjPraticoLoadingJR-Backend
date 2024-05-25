@@ -5,8 +5,15 @@ using PublicationsAPI.Models;
 namespace PublicationsAPI.Services {
     public class UsersServices : IUsersServices
     {
-         public Users RegisterUser(RegisterDto registerDto){
-            throw new NotImplementedException("RegisterUser service not yet implemented");
-         }
+        private readonly IUsersRepository _usersRepository;
+        public UsersServices(IUsersRepository usersRepository)
+        {
+            _usersRepository = usersRepository;
+        }
+        public async Task<IEnumerable<Publications>> GetPublicationsByUserUuidAsync(string userUuid)
+        {
+            var user = await _usersRepository.getPublicationsByUser(userUuid);
+            return user?.UserPublications ?? new List<Publications>();
+        }
     }
 }

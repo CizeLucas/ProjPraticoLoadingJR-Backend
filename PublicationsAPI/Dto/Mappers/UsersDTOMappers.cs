@@ -36,10 +36,6 @@ namespace PublicationsAPI.DTO.Mappers
         //(FOR RESPONSE) Returns a NEW LoggedOutUserResponse DTO based on information based from User of type Users
         public static LoggedOutUserResponse? UsersToLoggedOutUser(this Users user)
         {
-
-            if(user == null)
-                return null;
-
             return new LoggedOutUserResponse{
                 Uuid = user.Uuid,
                 Name = user.Name,
@@ -52,10 +48,7 @@ namespace PublicationsAPI.DTO.Mappers
 
         //(FOR RESPONSE) Returns a NEW LoggedInUserResponse DTO based on information based from User of type Users
         public static LoggedInUserResponse? UsersToLoggedInUser(this Users user)
-        {   
-            if(user == null)
-                return null;
-
+        {
             return new LoggedInUserResponse{
                 Uuid = user.Uuid,
                 Name = user.Name,

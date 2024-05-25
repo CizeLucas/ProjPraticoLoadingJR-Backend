@@ -106,11 +106,15 @@ namespace PublicationsAPI
                 };
             });
 
+            //Setting up Dependency Injection for Repositories and Services
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+            builder.Services.AddScoped<IPublicationsRepository, PublicationsRepository>();
+
             builder.Services.AddScoped<IUsersServices, UsersServices>();
             builder.Services.AddScoped<IAccountsService, AccountsService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            builder.Services.AddScoped<IPublicationsService, PublicationsService>();
+            
             
             var app = builder.Build();
 

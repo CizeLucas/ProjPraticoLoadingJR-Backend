@@ -19,5 +19,7 @@ namespace PublicationsAPI.Interfaces
         public Task<LoggedInUserResponse> AddUserAsync(UserRequest userDTO, string uuid);
         public Task<LoggedInUserResponse> UpdateUserAsync(UserRequest user, string userUuid);
         public Task<bool> DeleteUserAsync(string uuid);
+
+        public Task<Users> getPublicationsByUser(string userUuid);
     }
 }

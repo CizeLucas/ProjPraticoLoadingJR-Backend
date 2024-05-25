@@ -123,5 +123,10 @@ namespace PublicationsAPI.Repositories
 			return UsersDTOMappers.UsersToLoggedInUser(await _userManager.FindByIdAsync(userUuid));
         }
 
+        public async Task<Users> getPublicationsByUser(string userUuid)
+        {
+            return await _context.Users.Include(u => u.UserPublications)
+				.FirstOrDefaultAsync(u => u.Uuid == userUuid);
+        }
     }
 }

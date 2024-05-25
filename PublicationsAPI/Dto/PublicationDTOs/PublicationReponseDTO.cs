@@ -3,9 +3,9 @@ using PublicationsAPI.Models;
 
 namespace PublicationsAPI.DTO.Publication
 {
-	public class LoggedOutPublicationDTO
+	public class PublicationResponseDTO
 	{
-		[Required]
+        [Required]
         [MaxLength(40)]
 		public string Uuid { get; set; } //UUID V4 for publicly accessing and identifying users
 
@@ -28,8 +28,5 @@ namespace PublicationsAPI.DTO.Publication
         [Required]
         public DateTime UpdatedAt { get; set; } //Date of the lastest update of the publication
 
-        //  ONE-TO-ONE DB relationship
-        public int? AuthorId { get; set; } //Foreing Key
-        public Users? Author { get; set; } //Navigation proprierty
 	}
 }

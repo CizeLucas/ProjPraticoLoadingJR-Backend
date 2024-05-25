@@ -6,5 +6,6 @@ namespace PublicationsAPI.Interfaces
 {
     public interface IUsersServices
     {
+        public Task<IEnumerable<Publications>> GetPublicationsByUserUuidAsync(string userUuid);
     }
 }

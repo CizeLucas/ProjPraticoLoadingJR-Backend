@@ -33,7 +33,9 @@ namespace PublicationsAPI.Models {
         public DateTime UpdatedAt { get; set; } //Date of the lastest update of the publication
 
         //  ONE-TO-ONE DB relationship
-        public int? AuthorId { get; set; } //Foreing Key
+        [Required]
+        [StringLength(36, MinimumLength = 36, ErrorMessage = "The UUID must have a exact lenght of 36 characters")]
+        public string? AuthorUuid { get; set; } //Foreing Key
         public Users? Author { get; set; } //Navigation proprierty
 
     }
