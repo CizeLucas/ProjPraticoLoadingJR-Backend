@@ -31,24 +31,18 @@ namespace PublicationsAPI.Repositories
         }
         public async Task<LoggedOutUserResponse>? GetByUsernameAsync(string UserName)
         {
-            return UsersDTOMappers.UsersToLoggedOutUser( 
-				await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)
-			);
+            return (await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)).UsersToLoggedOutUser();
         }
-		public async Task<LoggedInUserResponse> GetUserAsync(string uuid) 
+		public async Task<LoggedInUserResponse>? GetUserAsync(string uuid) 
 		{
-			return UsersDTOMappers.UsersToLoggedInUser( 
-				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid)
-			);
+			return (await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid)).UsersToLoggedInUser();
 		}
         public async Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid)
         {
-            return UsersDTOMappers.UsersToLoggedOutUser( 
-				await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) 
-				);
+            return (await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) ).UsersToLoggedOutUser();
         }
 
-        public async Task<LoggedInUserResponse> AddUserAsync(UserRequest userToCreate, string uuid)
+        public async Task<LoggedInUserResponse>? AddUserAsync(UserRequest userToCreate, string uuid)
         {
 			if(userToCreate == null)
 				return null;
@@ -74,7 +68,7 @@ namespace PublicationsAPI.Repositories
 				throw new Exception($"Failed to update user: {errors}");
 			}
 
-			return UsersDTOMappers.UsersToLoggedInUser(await _userManager.FindByIdAsync(uuid));
+			return (await _userManager.FindByIdAsync(uuid)).UsersToLoggedInUser();
         }
 
         public async Task<bool> DeleteUserAsync(string uuid)
@@ -94,7 +88,7 @@ namespace PublicationsAPI.Repositories
 
 			return deleteResult.Succeeded;
         }
-        public async Task<IEnumerable<LoggedOutUserResponse>> GetPaginatedAsync(int page, int pageSize)
+        public async Task<IEnumerable<LoggedOutUserResponse>>? GetPaginatedAsync(int page, int pageSize)
         {
 			var paginatedResponse = await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return paginatedResponse.Select(user => user.UsersToLoggedOutUser());
@@ -120,13 +114,12 @@ namespace PublicationsAPI.Repositories
 				throw new Exception($"Failed to update user: {errors}");
 			}
 			
-			return UsersDTOMappers.UsersToLoggedInUser(await _userManager.FindByIdAsync(userUuid));
+			return (await _userManager.FindByIdAsync(userUuid)).UsersToLoggedInUser();
         }
 
-        public async Task<Users> getPublicationsByUser(string userUuid)
+        public async Task<Users>? getPublicationsByUser(string userUuid)
         {
-            return await _context.Users.Include(u => u.UserPublications)
-				.FirstOrDefaultAsync(u => u.Uuid == userUuid);
+            return await _context.Users.Include(u => u.UserPublications).FirstOrDefaultAsync(u => u.Uuid == userUuid);
         }
     }
 }

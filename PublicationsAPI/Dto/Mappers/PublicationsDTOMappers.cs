@@ -1,4 +1,5 @@
 using PublicationsAPI.DTO.Publication;
+using PublicationsAPI.Helper;
 using PublicationsAPI.Models;
 
 namespace PublicationsAPI.DTO.Mappers
@@ -11,7 +12,7 @@ namespace PublicationsAPI.DTO.Mappers
             {
                 Title = publication.Title,
                 Description = publication.Description,
-                PublicationType = publication.PublicationType,
+                PublicationType = PublicationTypes.getStringValueFromInt(publication.PublicationType),
                 ImageURL = publication.ImageURL
             };
         }
@@ -22,7 +23,7 @@ namespace PublicationsAPI.DTO.Mappers
             {
                 Title = publicationDTO.Title,
                 Description = publicationDTO.Description,
-                PublicationType = publicationDTO.PublicationType,
+                PublicationType = PublicationTypes.getIntValueFromString(publicationDTO.PublicationType),
                 ImageURL = publicationDTO.ImageURL
             };
         }
@@ -34,7 +35,7 @@ namespace PublicationsAPI.DTO.Mappers
                 Uuid = publication.Uuid,
                 Title = publication.Title,
                 Description = publication.Description,
-                PublicationType = publication.PublicationType,
+                PublicationType = PublicationTypes.getStringValueFromInt(publication.PublicationType),
                 ImageURL = publication.ImageURL,
                 CreatedAt = publication.CreatedAt,
                 UpdatedAt = publication.UpdatedAt
@@ -48,7 +49,7 @@ namespace PublicationsAPI.DTO.Mappers
                 Uuid = publicationRespDTO.Uuid,
                 Title = publicationRespDTO.Title,
                 Description = publicationRespDTO.Description,
-                PublicationType = publicationRespDTO.PublicationType,
+                PublicationType = PublicationTypes.getIntValueFromString(publicationRespDTO.PublicationType),
                 ImageURL = publicationRespDTO.ImageURL,
                 CreatedAt = publicationRespDTO.CreatedAt,
                 UpdatedAt = publicationRespDTO.UpdatedAt

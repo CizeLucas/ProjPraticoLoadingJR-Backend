@@ -4,16 +4,16 @@ namespace PublicationsAPI.Helper
 {
     public static class PublicationTypes
     {
-        public enum PublicationTypeEnum : byte
+        public enum PublicationTypeEnum : int
         {
-            unknown = 0,
-            Blog = 1,
-            Edict = 2,
-            News = 3,
-            Advertising = 4,
-            Event = 5,
-            Tutorial = 6,
-            Research = 7,
+            UNKNOWN = 0,
+            BLOG = 1,
+            EDICT = 2,
+            NEWS = 3,
+            ADVERTISING = 4,
+            EVENT = 5,
+            TUTORIAL = 6,
+            RESEARCH = 7,
         }
 
         public static int getIntValueFromString(string PublicationStringType)
@@ -22,16 +22,16 @@ namespace PublicationsAPI.Helper
             {
                 return (int)publicationType;
             }
-            return (int)PublicationTypeEnum.unknown; // Default case if string value not found
+            return (int)PublicationTypeEnum.UNKNOWN; // Default case if string value not found
         }
 
-        public static string getStringValueFromInt(byte PublicationIntType)
+        public static string getStringValueFromInt(int PublicationIntType)
         {
             if (Enum.IsDefined(typeof(PublicationTypeEnum), PublicationIntType))
             {
                 return Enum.GetName(typeof(PublicationTypeEnum), PublicationIntType);
             }
-            return PublicationTypeEnum.unknown.ToString(); // Default case if int value not found
+            return PublicationTypeEnum.UNKNOWN.ToString(); // Default case if int value not found
         }
     }
 }

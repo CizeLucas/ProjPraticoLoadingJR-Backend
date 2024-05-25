@@ -23,7 +23,7 @@ namespace PublicationsAPI.Services {
             
             publication.Title = publicationDto.Title;
             publication.Description = publicationDto.Description;
-            publication.PublicationType = publicationDto.PublicationType;
+            publication.PublicationType = PublicationTypes.getIntValueFromString(publicationDto.PublicationType);
             publication.ImageURL = publicationDto.ImageURL;
             publication.Uuid = UuidCreator.CreateUuid();
             publication.CreatedAt = DateTime.UtcNow;
@@ -73,7 +73,7 @@ namespace PublicationsAPI.Services {
             publicationToUpdate.Title = publicationDto.Title;
             publicationToUpdate.Description = publicationDto.Description;
             publicationToUpdate.ImageURL = publicationDto.ImageURL;
-            publicationToUpdate.PublicationType = publicationDto.PublicationType;
+            publicationToUpdate.PublicationType = PublicationTypes.getIntValueFromString(publicationDto.PublicationType);
             publicationToUpdate.UpdatedAt = DateTime.UtcNow;
 
             Publications? publicationUpdated = await _publicationsRepository.UpdatePublicationAsync(publicationToUpdate);
