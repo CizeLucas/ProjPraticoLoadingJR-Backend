@@ -17,8 +17,8 @@ namespace PublicationsAPI.Controllers
             _publicationsService = publicationsService;
         }
         
-        [HttpGet("uuid")]
-        public async Task<ActionResult<PublicationResponseDTO>> GetPublication([FromQuery] string publicationUuid)
+        [HttpGet("{publicationUuid}")]
+        public async Task<ActionResult<PublicationResponseDTO>> GetPublication([FromRoute] string publicationUuid)
         {
             var publication = await _publicationsService.GetPublicationAsync(publicationUuid);
 
@@ -56,8 +56,37 @@ namespace PublicationsAPI.Controllers
             return CreatedAtAction(nameof(CreatePublication), new {publicationUuid = createdPublication.Uuid}, createdPublication);
         }
 
+        [Authorize]
+        [HttpPut("{publicationUuid}")]
+        public async Task<IActionResult> UpdatePublication([FromRoute] string publicationUuid, [FromBody] PublicationDTO publicationDto)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest();
 
+            string userUuid = User.GetUuid();
 
+            if(string.IsNullOrEmpty(userUuid))
+                return Unauthorized();
+            
+            var updatedPublication = await _publicationsService.UpdatePublicationAsync(publicationUuid, publicationDto, userUuid);
+
+            if(updatedPublication == null)
+                return StatusCode(500);
+
+            return Ok(updatedPublication);
+        }
+
+        [Authorize]
+        [HttpDelete("{publicationUuid}")]
+        public async Task<IActionResult> DeletePublication([FromRoute] string publicationUuid)
+        {
+            string? userUuid = User.GetUuid();
+
+            if(await _publicationsService.DeletePublicationAsync(publicationUuid, userUuid))
+                return NoContent();
+            else
+                return StatusCode(500, "Publication not deleted because of a server error");
+        }
 
 
     }

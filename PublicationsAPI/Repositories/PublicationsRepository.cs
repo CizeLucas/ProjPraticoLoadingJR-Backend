@@ -57,12 +57,13 @@ namespace PublicationsAPI.Repositories {
 
         public async Task<Publications> GetPublicationAsync(string Uuid)
         {
-            Publications? publication = await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
+            return await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
+           /* Publications? publication = await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
 
             if(publication == null)
                 return null;
 
-            return publication;
+            return publication;*/
         }
 
         public async Task<IEnumerable<Publications>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize)
@@ -77,7 +78,7 @@ namespace PublicationsAPI.Repositories {
         public async Task<Publications> UpdatePublicationAsync(Publications publication)
         {
             try {
-                _context.Publications.Remove(publication);
+                _context.Publications.Update(publication);
                 await _context.SaveChangesAsync();
             } catch (Exception e) {
                 throw new Exception(e.Message + e.InnerException.ToString());

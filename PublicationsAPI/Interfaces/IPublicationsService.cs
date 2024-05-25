@@ -12,8 +12,8 @@ namespace PublicationsAPI.Interfaces
         public Task<IEnumerable<PublicationResponseDTO>> GetPublicationsFromUserAsync(string publisherUuid);
         public Task<IEnumerable<PublicationResponseDTO>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize);
         public Task<PublicationResponseDTO> AddPublicationAsync(string publisherUuid, PublicationDTO publicationDto);
-        public Task<PublicationResponseDTO> UpdatePublicationAsync(string publicationUuid, PublicationDTO publicationDto);
-        public Task<bool> DeletePublicationAsync(string publicationUuid);
+        public Task<PublicationResponseDTO> UpdatePublicationAsync(string publicationUuid, PublicationDTO publicationDto, string authorUuid);
+        public Task<bool> DeletePublicationAsync(string publicationUuid, string authorUuid);
 
         
     }

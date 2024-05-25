@@ -24,7 +24,7 @@ namespace PublicationsAPI.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("username")]
+        [HttpGet("{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromQuery] string username) {
