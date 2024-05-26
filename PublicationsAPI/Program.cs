@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -114,8 +115,14 @@ namespace PublicationsAPI
             builder.Services.AddScoped<IAccountsService, AccountsService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IPublicationsService, PublicationsService>();
-            
-            
+            /*
+            //Configuring AWS S3 Bucket Service
+            builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+            builder.Services.AddAWSService<IAmazonS3>();
+            */
+            var awsOptions = builder.Configuration.GetAWSOptions();
+            builder.Services.AddDefaultAWSOptions(awsOptions);
+            builder.Services.AddAWSService<IAmazonS3>();
             var app = builder.Build();
 
             app.MapIdentityApi<Users>();
