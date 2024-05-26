@@ -24,11 +24,15 @@ namespace PublicationsAPI.Services {
         {
             Publications? publication = new Publications();
             
-            try{    
-                publication.ImageURL = await _imageService.UploadImageAsync(image);
-            } catch (ArgumentException) {
-                publication.ImageURL = string.Empty;
+            if(image.Image != null)
+            {
+                try{    
+                    publication.ImageURL = await _imageService.UploadImageAsync(image);
+                } catch (Exception ex) {
+                    throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
+                }
             }
+
             publication.Title = publicationDto.Title;
             publication.Description = publicationDto.Description;
             publication.PublicationType = PublicationTypes.getIntValueFromString(publicationDto.PublicationType);
@@ -60,7 +64,7 @@ namespace PublicationsAPI.Services {
 
         public async Task<IEnumerable<PublicationResponseDTO>> GetPublicationsFromUserAsync(string publisherUuid)
         {   
-            var userPublications = await _usersServices.GetPublicationsByUserUuidAsync(publisherUuid);
+            var userPublications = await _usersServices.GetPublicationsByUserUuidService(publisherUuid);
             return userPublications.Select(p => p.PublicationsToPublicationResponseDTO()).ToList();
         }
 
@@ -84,10 +88,13 @@ namespace PublicationsAPI.Services {
             
             string? oldImageURL = publicationToUpdate.ImageURL;
 
-            try {
-                publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
-            } catch (Exception ex){
-                throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
+            if(image.Image != null)
+            {
+                try {
+                    publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
+                } catch (Exception ex){
+                    throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
+                }
             }
             publicationToUpdate.Title = publicationDto.Title;
             publicationToUpdate.Description = publicationDto.Description;

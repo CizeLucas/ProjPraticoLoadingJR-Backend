@@ -32,6 +32,18 @@ namespace PublicationsAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("where")]
+        public async Task<ActionResult<PublicationResponseDTO>> GetPublicationsPaginated([FromQuery(Name = "p")] int page, [FromQuery(Name = "ps")] int pageSize)
+        {
+            string? userUuid = User.GetUuid();
+
+            if(string.IsNullOrEmpty(userUuid))
+                return BadRequest();
+
+            return Ok(await _publicationsService.GetPublicationsPaginatedAsync(userUuid, page, pageSize));
+        }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<PublicationResponseDTO>> GetPublicationsFromUser()
         {

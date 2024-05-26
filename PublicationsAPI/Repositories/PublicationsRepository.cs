@@ -68,11 +68,7 @@ namespace PublicationsAPI.Repositories {
 
         public async Task<IEnumerable<Publications>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize)
         {
-            return await _context.Publications
-            .OrderBy(p => p.Id) // Ordering is important for pagination consistency
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+            return await (_context.Publications.OrderBy(p => p.Id).Skip((page - 1) * pageSize).Take(pageSize)).ToListAsync();
         }
 
         public async Task<Publications> UpdatePublicationAsync(Publications publication)

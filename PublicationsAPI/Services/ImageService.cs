@@ -47,7 +47,7 @@ namespace PublicationsAPI.Services {
 
         public async Task<string> updateImage(string? oldImageUrl, ImageUploadModel newImage)
         {
-            //Checks if the string is valid and if it is, then tries to delete the old image file
+            //Checks if the oldImageUrl string is valid and if it is, it then tries to delete the old image file
             if(!string.IsNullOrEmpty(oldImageUrl))
                 try {
                     if( !await DeleteImageLink(oldImageUrl) )
@@ -59,7 +59,10 @@ namespace PublicationsAPI.Services {
                     throw new Exception("ImageService Class: The old file could not be deleted", ex);
                 }
 
-            //Uploads the new image and returns the link of it
+            //Checks if the new image is valid, IF IT IS, then uploads the new image, or, IF IT ISN'T, then returns an empty string
+            if(newImage.Image == null)
+                return "";
+
             return await UploadImageAsync(newImage);
         }
 

@@ -23,32 +23,27 @@ namespace PublicationsAPI.Repositories
 		}
 
 		
-        public async Task<IEnumerable<LoggedOutUserResponse>> GetAllAsync()
+        public async Task<IEnumerable<Users>> GetAllAsync()
         {
-			var users = await _context.Users.ToListAsync<Users>();
-			
-            return users.Select(user => user.UsersToLoggedOutUser());
+			return await _context.Users.ToListAsync<Users>();
         }
-        public async Task<LoggedOutUserResponse>? GetByUsernameAsync(string UserName)
+        public async Task<Users>? GetByUsernameAsync(string UserName)
         {
-            return (await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName)).UsersToLoggedOutUser();
+            return await _context.Users.FirstOrDefaultAsync(user => user.UserName == UserName);
         }
-		public async Task<LoggedInUserResponse>? GetUserAsync(string uuid) 
+		public async Task<Users>? GetUserAsync(string uuid) 
 		{
-			return (await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid)).UsersToLoggedInUser();
+			return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid);
 		}
-        public async Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid)
+        public async Task<Users>? GetByUuidAsync(string uuid)
         {
-            return (await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid) ).UsersToLoggedOutUser();
+            return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid);
         }
 
-        public async Task<LoggedInUserResponse>? AddUserAsync(UserRequest userToCreate, string uuid)
+        public async Task<Users>? AddUserAsync(UserRequest userToCreate, string uuid, ImageUploadModel image)
         {
 			if(userToCreate == null)
 				return null;
-
-			if(userToCreate.UserName == null)
-				userToCreate.UserName = userToCreate.Name.Replace(" ", "").Trim().ToLower();
 
 			Users? user = await _userManager.FindByIdAsync(uuid);
 
@@ -68,7 +63,7 @@ namespace PublicationsAPI.Repositories
 				throw new Exception($"Failed to update user: {errors}");
 			}
 
-			return (await _userManager.FindByIdAsync(uuid)).UsersToLoggedInUser();
+			return user; //await _userManager.FindByIdAsync(uuid);
         }
 
         public async Task<bool> DeleteUserAsync(string uuid)
@@ -88,19 +83,20 @@ namespace PublicationsAPI.Repositories
 
 			return deleteResult.Succeeded;
         }
-        public async Task<IEnumerable<LoggedOutUserResponse>>? GetPaginatedAsync(int page, int pageSize)
+        public async Task<IEnumerable<Users>>? GetUsersPaginatedAsync(int page, int pageSize)
         {
-			var paginatedResponse = await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            return paginatedResponse.Select(user => user.UsersToLoggedOutUser());
+			return await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
-        public async Task<LoggedInUserResponse> UpdateUserAsync(UserRequest updatedUser, string userUuid)
+        public async Task<Users>? UpdateUserAsync(UserRequest updatedUser, string userUuid, ImageUploadModel image)
         {
             Users? user = await _userManager.FindByIdAsync(userUuid);
 
 			if (user == null)
 				return null;
 			
+			
+
 			user.Name = updatedUser.Name;
 			user.UserName = updatedUser.UserName;
 			user.Bio = updatedUser.Bio;
@@ -114,7 +110,7 @@ namespace PublicationsAPI.Repositories
 				throw new Exception($"Failed to update user: {errors}");
 			}
 			
-			return (await _userManager.FindByIdAsync(userUuid)).UsersToLoggedInUser();
+			return user;
         }
 
         public async Task<Users>? getPublicationsByUser(string userUuid)

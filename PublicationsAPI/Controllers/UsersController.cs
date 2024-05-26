@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using PublicationsAPI.DTO.AccountDto;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace PublicationsAPI.Controllers
 {
@@ -16,20 +17,20 @@ namespace PublicationsAPI.Controllers
     [Route("api/user")]
     public class UsersController : ControllerBase
     {
-        public readonly IUsersRepository _usersRepository;
-        private readonly UserManager<Users> _userManager;
-        public UsersController(IUsersRepository usersRepository, UserManager<Users> userManager)
+        private readonly IUsersServices _usersServices;
+        private readonly IImageService _imageService;
+        public UsersController(IUsersServices usersServices, IImageService imageService)
         {
-            _usersRepository = usersRepository;
-            _userManager = userManager;
+            _usersServices = usersServices;
+            _imageService = imageService;
         }
 
-        [HttpGet("{username}")]
+        [HttpGet("username/{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromQuery] string username) {
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUsername([FromRoute] string username) {
 
-            var user = await _usersRepository.GetByUsernameAsync(username);
+            var user = await _usersServices.GetUserByUsernameService(username);
 
             if(user == null)
                 return NotFound();
@@ -37,16 +38,16 @@ namespace PublicationsAPI.Controllers
             return Ok(user);
         }
 
-        [HttpGet("uuid")]
+        [HttpGet("uuid/{uuid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoggedOutUserResponse>> GetByUuid([FromQuery] string uuid) {
+        public async Task<ActionResult<LoggedOutUserResponse>> GetByUuid([FromRoute] string uuid) {
 
-            if(String.IsNullOrEmpty(uuid) || uuid.Length != 32)
+            if(string.IsNullOrEmpty(uuid) || uuid.Length != 32)
                 return BadRequest("The UUID of the request is incorrect. It needs to have exactly 32 characters");
 
-            LoggedOutUserResponse? user = await _usersRepository.GetByUuidAsync(uuid);
+            var user = await _usersServices.GetUserByUuidService(uuid);
             if(user == null)
                 return NotFound();
             
@@ -58,12 +59,19 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult<List<LoggedOutUserResponse>>> GetAll() {
-            var users = await _usersRepository.GetAllAsync();
+            var users = await _usersServices.GetAllUsersService();
 
             if(!users.Any()) 
                 return NoContent();
 
             return Ok(users);
+        }
+
+        [Authorize]
+        [HttpGet("where")]
+        public async Task<ActionResult<LoggedInUserResponse>> GetPublicationsPaginated([FromQuery(Name = "p")] int page, [FromQuery(Name = "ps")] int pageSize)
+        {
+            return Ok(await _usersServices.GetUsersPaginatedService(page, pageSize));
         }
 
         [Authorize]
@@ -76,9 +84,9 @@ namespace PublicationsAPI.Controllers
             string? uuid = User.GetUuid();
             
             if(string.IsNullOrEmpty(uuid))
-                return Unauthorized("Um problema com o seu token JWT foi identificado"); 
+                return BadRequest("A problem with your JWT token was found, please login again."); 
             
-            LoggedInUserResponse? user = await _usersRepository.GetUserAsync(uuid);
+            LoggedInUserResponse? user = await _usersServices.GetUserService(uuid);
 
             if(user == null)
                 return NotFound();
@@ -94,15 +102,14 @@ namespace PublicationsAPI.Controllers
         public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromBody] UserRequest user){
             
             string? uuid = User.GetUuid();
-
-            var result = await _usersRepository.AddUserAsync(user, uuid);
+            ImageUploadModel image = null;
+            var result = await _usersServices.AddUserService(user, uuid, image);
 
             if(result == null)
                 return BadRequest("A problem occured while processing the request of adding a new user.");
 
             return CreatedAtAction(nameof(AddUser), new {uuid = result.Uuid}, result);
         }
-
 
         [Authorize]
         [HttpPut]
@@ -115,9 +122,12 @@ namespace PublicationsAPI.Controllers
             string? uuid = User.GetUuid();
 
             if(string.IsNullOrEmpty(uuid))
-                return Unauthorized("Um problema com o seu token JWT foi identificado");
+                return BadRequest("A problem with your JWT token was found, please login again.");
+
             try{
-                var result = await _usersRepository.UpdateUserAsync(user, uuid);
+                ImageUploadModel image = null;
+                var result = await _usersServices.UpdateUserService(user, uuid, image);
+
                 if(result == null)
                     return BadRequest("");
                 return Ok(result);
@@ -133,9 +143,13 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteUser() {
+
             string? uuid = User.GetUuid();
 
-            bool operationState = await _usersRepository.DeleteUserAsync(uuid);
+            if(string.IsNullOrEmpty(uuid))
+                return BadRequest();
+
+            bool operationState = await _usersServices.DeleteUserService(uuid);
 
             if(operationState == false)
                 return StatusCode(500);

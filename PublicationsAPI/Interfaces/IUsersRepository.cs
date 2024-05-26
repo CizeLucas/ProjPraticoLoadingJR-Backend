@@ -8,16 +8,16 @@ namespace PublicationsAPI.Interfaces
     {
         //NOT AUTHORIZED (PUBLIC) METHODS:
         
-        public Task<IEnumerable<LoggedOutUserResponse>>? GetPaginatedAsync(int page, int pageSize);
-        public Task<LoggedOutUserResponse>? GetByUuidAsync(string uuid);
-        public Task<LoggedOutUserResponse>? GetByUsernameAsync(string username);
+        public Task<IEnumerable<Users>>? GetUsersPaginatedAsync(int page, int pageSize);
+        public Task<Users>? GetByUuidAsync(string uuid);
+        public Task<Users>? GetByUsernameAsync(string username);
 
 
         //ONLY IF USER IS AUTHORIZED METHODS:
-        public Task<IEnumerable<LoggedOutUserResponse>>? GetAllAsync();
-        public Task<LoggedInUserResponse>? GetUserAsync(string uuid);
-        public Task<LoggedInUserResponse>? AddUserAsync(UserRequest userDTO, string uuid);
-        public Task<LoggedInUserResponse>? UpdateUserAsync(UserRequest user, string userUuid);
+        public Task<IEnumerable<Users>>? GetAllAsync();
+        public Task<Users>? GetUserAsync(string uuid); //LoggedInUserResponse
+        public Task<Users>? AddUserAsync(UserRequest userDTO, string uuid, ImageUploadModel image);
+        public Task<Users>? UpdateUserAsync(UserRequest user, string userUuid, ImageUploadModel image);
         public Task<bool> DeleteUserAsync(string uuid);
 
         public Task<Users>? getPublicationsByUser(string userUuid);
