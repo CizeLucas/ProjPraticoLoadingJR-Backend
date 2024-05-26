@@ -13,7 +13,6 @@ namespace PublicationsAPI.DTO.Mappers
                 Title = publication.Title,
                 Description = publication.Description,
                 PublicationType = PublicationTypes.getStringValueFromInt(publication.PublicationType),
-                ImageURL = publication.ImageURL
             };
         }
 
@@ -24,7 +23,6 @@ namespace PublicationsAPI.DTO.Mappers
                 Title = publicationDTO.Title,
                 Description = publicationDTO.Description,
                 PublicationType = PublicationTypes.getIntValueFromString(publicationDTO.PublicationType),
-                ImageURL = publicationDTO.ImageURL
             };
         }
 

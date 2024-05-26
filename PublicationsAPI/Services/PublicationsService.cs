@@ -4,6 +4,7 @@ using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 using PublicationsAPI.Helper;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PublicationsAPI.Services {
     public class PublicationsService : IPublicationsService
@@ -11,20 +12,26 @@ namespace PublicationsAPI.Services {
 
         private readonly IPublicationsRepository _publicationsRepository;
         private readonly IUsersServices _usersServices;
-        public PublicationsService(IPublicationsRepository publicationsRepository, IUsersServices usersServices)
+        private readonly IImageService _imageService;
+        public PublicationsService(IPublicationsRepository publicationsRepository, IUsersServices usersServices, IImageService imageService)
         {
             _publicationsRepository = publicationsRepository;
             _usersServices = usersServices;
+            _imageService = imageService;
         }
 
-        public async Task<PublicationResponseDTO> AddPublicationAsync(string publisherUuid, PublicationDTO publicationDto)
+        public async Task<PublicationResponseDTO> AddPublicationAsync(string publisherUuid, PublicationDTO publicationDto, ImageUploadModel image)
         {
             Publications? publication = new Publications();
             
+            try{    
+                publication.ImageURL = await _imageService.UploadImageAsync(image);
+            } catch (ArgumentException) {
+                publication.ImageURL = string.Empty;
+            }
             publication.Title = publicationDto.Title;
             publication.Description = publicationDto.Description;
             publication.PublicationType = PublicationTypes.getIntValueFromString(publicationDto.PublicationType);
-            publication.ImageURL = publicationDto.ImageURL;
             publication.Uuid = UuidCreator.CreateUuid();
             publication.CreatedAt = DateTime.UtcNow;
             publication.UpdatedAt = DateTime.UtcNow;
@@ -35,18 +42,20 @@ namespace PublicationsAPI.Services {
 
         public async Task<bool> DeletePublicationAsync(string publicationUuid, string authorUuid)
         {
-            if( !((await _publicationsRepository.GetPublicationAsync(publicationUuid)).AuthorUuid == authorUuid) )
-            {
-                return false;
-                //throw unauthenticated exception
-            }
+            Publications? publicationToDelete = await _publicationsRepository.GetPublicationAsync(publicationUuid);
+            if ( !(publicationToDelete.AuthorUuid == authorUuid) )
+                throw new UnauthorizedAccessException("PublicationsService Class: You don't have permission to delete this publication because it is owned by other user!");
             else 
+            {
+                await _imageService.DeleteImageLink(publicationToDelete.ImageURL);
                 return await _publicationsRepository.DeletePublicationAsync(publicationUuid);
+            }
         }
 
         public async Task<PublicationResponseDTO> GetPublicationAsync(string publicationUuid)
-        {
-           return (await _publicationsRepository.GetPublicationAsync(publicationUuid)).PublicationsToPublicationResponseDTO();
+        { 
+            Publications? publication = await _publicationsRepository.GetPublicationAsync(publicationUuid);
+            return publication.PublicationsToPublicationResponseDTO();
         }
 
         public async Task<IEnumerable<PublicationResponseDTO>> GetPublicationsFromUserAsync(string publisherUuid)
@@ -63,16 +72,25 @@ namespace PublicationsAPI.Services {
             return publications.Select(publications => publications.PublicationsToPublicationResponseDTO());
         }
 
-        public async Task<PublicationResponseDTO> UpdatePublicationAsync(string publicationUuid, PublicationDTO publicationDto, string authorUuid)
+        public async Task<PublicationResponseDTO> UpdatePublicationAsync(string publicationUuid, PublicationDTO publicationDto, ImageUploadModel image, string authorUuid)
         {
             Publications publicationToUpdate = await _publicationsRepository.GetPublicationAsync(publicationUuid);
 
-            if(publicationToUpdate == null)
-                throw new NullReferenceException("Any Publication with this UUID was found");
+            if(!(publicationToUpdate.AuthorUuid == authorUuid))
+                throw new UnauthorizedAccessException("PublicationsService Class: You don't have permission to edit this publication because it is owned by other user!");
 
+            if(publicationToUpdate == null)
+                throw new NullReferenceException("PublicationsService Class: Any Publication with this UUID was found");
+            
+            string? oldImageURL = publicationToUpdate.ImageURL;
+
+            try {
+                publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
+            } catch (Exception ex){
+                throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
+            }
             publicationToUpdate.Title = publicationDto.Title;
             publicationToUpdate.Description = publicationDto.Description;
-            publicationToUpdate.ImageURL = publicationDto.ImageURL;
             publicationToUpdate.PublicationType = PublicationTypes.getIntValueFromString(publicationDto.PublicationType);
             publicationToUpdate.UpdatedAt = DateTime.UtcNow;
 
@@ -83,5 +101,23 @@ namespace PublicationsAPI.Services {
 
             return publicationUpdated.PublicationsToPublicationResponseDTO();
         }
+
+        public async Task<PublicationResponseDTO> UpdatePublicationImageAsync(string publicationUuid, ImageUploadModel image)
+        {
+            Publications publicationToUpdate = await _publicationsRepository.GetPublicationAsync(publicationUuid);
+
+            string? oldImageURL = publicationToUpdate.ImageURL;
+
+            try {
+                publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
+            } catch (Exception ex){
+                throw ex;
+            }
+
+            publicationToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            return publicationToUpdate.PublicationsToPublicationResponseDTO();
+        }
+    
     }
 }

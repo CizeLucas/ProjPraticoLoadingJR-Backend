@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PublicationsAPI.DTO.Publication;
 using PublicationsAPI.Extensions;
 using PublicationsAPI.Interfaces;
+using PublicationsAPI.Models;
 
 namespace PublicationsAPI.Controllers
 {
@@ -12,9 +13,11 @@ namespace PublicationsAPI.Controllers
     {
 
         private readonly IPublicationsService _publicationsService;
-        public PublicationsController(IPublicationsService publicationsService)
+        private readonly IImageService _imageService;
+        public PublicationsController(IPublicationsService publicationsService, IImageService imageService)
         {
             _publicationsService = publicationsService;
+            _imageService = imageService;
         }
         
         [HttpGet("{publicationUuid}")]
@@ -38,42 +41,49 @@ namespace PublicationsAPI.Controllers
                 return Unauthorized();
 
             var publication = await _publicationsService.GetPublicationsFromUserAsync(userUuid);
-
+            
             return Ok(publication);
         }
 
+
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<PublicationResponseDTO>> CreatePublication([FromBody] PublicationDTO publicationDto)
-        {
+        public async Task<ActionResult<PublicationResponseDTO>> CreatePublication(
+            [FromForm] PublicationDTO publicationDto, [FromForm] ImageUploadModel image
+        ) {
             string? userUuid = User.GetUuid();
 
             if(string.IsNullOrEmpty(userUuid))
                 return Unauthorized();
 
-            var createdPublication = await _publicationsService.AddPublicationAsync(userUuid, publicationDto);
+            var createdPublication = await _publicationsService.AddPublicationAsync(userUuid, publicationDto, image);
 
             return CreatedAtAction(nameof(CreatePublication), new {publicationUuid = createdPublication.Uuid}, createdPublication);
         }
 
+
         [Authorize]
         [HttpPut("{publicationUuid}")]
-        public async Task<IActionResult> UpdatePublication([FromRoute] string publicationUuid, [FromBody] PublicationDTO publicationDto)
-        {
+        public async Task<IActionResult> UpdatePublication(
+            [FromRoute] string publicationUuid, [FromForm] PublicationDTO publicationDto, [FromForm] ImageUploadModel image
+        ) {
             if(!ModelState.IsValid)
                 return BadRequest();
 
             string userUuid = User.GetUuid();
 
-            if(string.IsNullOrEmpty(userUuid))
-                return Unauthorized();
+            try {
+
+                var updatedPublication = await _publicationsService.UpdatePublicationAsync(publicationUuid, publicationDto, image, userUuid);
+                
+                if(updatedPublication == null)
+                    return StatusCode(500);
+
+                return Ok(updatedPublication);
             
-            var updatedPublication = await _publicationsService.UpdatePublicationAsync(publicationUuid, publicationDto, userUuid);
-
-            if(updatedPublication == null)
-                return StatusCode(500);
-
-            return Ok(updatedPublication);
+            } catch (UnauthorizedAccessException ex) {
+                return Unauthorized(ex.Message);
+            }
         }
 
         [Authorize]
@@ -81,11 +91,15 @@ namespace PublicationsAPI.Controllers
         public async Task<IActionResult> DeletePublication([FromRoute] string publicationUuid)
         {
             string? userUuid = User.GetUuid();
-
-            if(await _publicationsService.DeletePublicationAsync(publicationUuid, userUuid))
-                return NoContent();
-            else
-                return StatusCode(500, "Publication not deleted because of a server error");
+            
+            try{
+                if(await _publicationsService.DeletePublicationAsync(publicationUuid, userUuid))
+                    return NoContent();
+                else
+                    return StatusCode(500, "Publication not deleted because of a server error");
+            } catch (UnauthorizedAccessException ex) {
+                return Unauthorized(new {error = ex.Message });
+            }
         }
 
 

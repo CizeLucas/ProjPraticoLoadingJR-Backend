@@ -15,8 +15,5 @@ namespace PublicationsAPI.DTO.Publication
         [Required]
         public string PublicationType { get; set; } //Integer for specifying publication type of the publication
 
-        [MaxLength(150)]
-        public string? ImageURL { get; set; } //Image url of the publication
-
 	}
 }
