@@ -61,7 +61,7 @@ namespace PublicationsAPI.Services {
             if(userDTO == null)
 				return null;
 
-			Users? user = await _userManager.FindByIdAsync(uuid);
+			Users? user = await _usersRepository.GetUserAsync(uuid);
 
 			if(user == null)
 				return null;
@@ -92,7 +92,7 @@ namespace PublicationsAPI.Services {
 
         public async Task<LoggedInUserResponse> UpdateUserService(UserRequest userDTO, string userUuid, ImageUploadModel image)
         {
-             Users? user = await _userManager.FindByIdAsync(userUuid);
+             Users? user = await _usersRepository.GetUserAsync(userUuid);
 
 			if (user == null)
 				return null;

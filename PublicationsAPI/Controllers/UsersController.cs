@@ -129,11 +129,12 @@ namespace PublicationsAPI.Controllers
 
                 if(result == null)
                     return BadRequest("");
-                    
+
                 return Ok(result);
 
             } catch(Exception e) {
-                return BadRequest(new { e.Message });
+                var error = e.ToString();
+                return BadRequest(new { error });
             }
         }
 
