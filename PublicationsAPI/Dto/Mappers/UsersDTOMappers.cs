@@ -15,7 +15,7 @@ namespace PublicationsAPI.DTO.Mappers
                 UserName = user.UserName,
                 Bio = user.Bio,
                 //Email = user.Email,
-                ImageUrl = user.ImageUrl
+                //ImageUrl = user.ImageUrl
             };
         }
 
@@ -29,7 +29,7 @@ namespace PublicationsAPI.DTO.Mappers
                 UserName = user.UserName,
                 Bio = user.Bio,
                 //Email = user.Email,
-                ImageUrl = user.ImageUrl
+                //ImageUrl = user.ImageUrl
             };
         }
 

@@ -39,8 +39,20 @@ namespace PublicationsAPI.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(user => user.Uuid == uuid);
         }
+        
+        public async Task<IEnumerable<Users>>? GetUsersPaginatedAsync(int page, int pageSize)
+        {
+			return await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
 
-        public async Task<Users>? AddUserAsync(UserRequest userToCreate, string uuid, ImageUploadModel image)
+        public async Task<Users>? getPublicationsByUser(string userUuid)
+        {
+            return await _context.Users.Include(u => u.UserPublications).FirstOrDefaultAsync(u => u.Uuid == userUuid);
+        }
+
+		
+/*
+		public async Task<Users>? AddUserAsync(UserRequest userToCreate, string uuid)
         {
 			if(userToCreate == null)
 				return null;
@@ -66,36 +78,12 @@ namespace PublicationsAPI.Repositories
 			return user; //await _userManager.FindByIdAsync(uuid);
         }
 
-        public async Task<bool> DeleteUserAsync(string uuid)
-        {
-            Users? user = await _userManager.FindByIdAsync(uuid);
-
-			if(user == null)
-				return false;
-			
-			var deleteResult = await _userManager.DeleteAsync(user);
-			
-			if (!deleteResult.Succeeded)
-			{
-				var errors = string.Join(", ", deleteResult.Errors.Select(e => e.Description));
-				throw new Exception($"Failed to update user: {errors}");
-			}
-
-			return deleteResult.Succeeded;
-        }
-        public async Task<IEnumerable<Users>>? GetUsersPaginatedAsync(int page, int pageSize)
-        {
-			return await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-        }
-
-        public async Task<Users>? UpdateUserAsync(UserRequest updatedUser, string userUuid, ImageUploadModel image)
+		public async Task<Users>? UpdateUserAsync(UserRequest updatedUser, string userUuid)
         {
             Users? user = await _userManager.FindByIdAsync(userUuid);
 
 			if (user == null)
 				return null;
-			
-			
 
 			user.Name = updatedUser.Name;
 			user.UserName = updatedUser.UserName;
@@ -113,9 +101,25 @@ namespace PublicationsAPI.Repositories
 			return user;
         }
 
-        public async Task<Users>? getPublicationsByUser(string userUuid)
+
+		public async Task<bool> DeleteUserAsync(string uuid)
         {
-            return await _context.Users.Include(u => u.UserPublications).FirstOrDefaultAsync(u => u.Uuid == userUuid);
+            Users? user = await _userManager.FindByIdAsync(uuid);
+
+			if(user == null)
+				return false;
+			
+			var deleteResult = await _userManager.DeleteAsync(user);
+			
+			if (!deleteResult.Succeeded)
+			{
+				var errors = string.Join(", ", deleteResult.Errors.Select(e => e.Description));
+				throw new Exception($"Failed to update user: {errors}");
+			}
+
+			return deleteResult.Succeeded;
         }
+
+*/
     }
 }

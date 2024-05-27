@@ -88,13 +88,11 @@ namespace PublicationsAPI.Services {
             
             string? oldImageURL = publicationToUpdate.ImageURL;
 
-            if(image.Image != null)
-            {
-                try {
-                    publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
-                } catch (Exception ex){
-                    throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
-                }
+
+            try {
+                publicationToUpdate.ImageURL = await _imageService.updateImage(oldImageURL, image);
+            } catch (Exception ex){
+                throw new Exception("PublicationService Class: a problem with the image update occoured.", ex);
             }
             publicationToUpdate.Title = publicationDto.Title;
             publicationToUpdate.Description = publicationDto.Description;

@@ -99,10 +99,10 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromBody] UserRequest user){
+        public async Task<ActionResult<LoggedInUserResponse>> AddUser([FromForm] UserRequest user, [FromForm] ImageUploadModel image){
             
             string? uuid = User.GetUuid();
-            ImageUploadModel image = null;
+
             var result = await _usersServices.AddUserService(user, uuid, image);
 
             if(result == null)
@@ -116,7 +116,7 @@ namespace PublicationsAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<LoggedInUserResponse>> UpdateUser([FromBody] UserRequest user)
+        public async Task<ActionResult<LoggedInUserResponse>> UpdateUser([FromForm] UserRequest user, [FromForm] ImageUploadModel image)
         {
             
             string? uuid = User.GetUuid();
@@ -125,11 +125,11 @@ namespace PublicationsAPI.Controllers
                 return BadRequest("A problem with your JWT token was found, please login again.");
 
             try{
-                ImageUploadModel image = null;
                 var result = await _usersServices.UpdateUserService(user, uuid, image);
 
                 if(result == null)
                     return BadRequest("");
+                    
                 return Ok(result);
 
             } catch(Exception e) {

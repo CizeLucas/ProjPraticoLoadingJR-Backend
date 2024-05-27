@@ -58,12 +58,6 @@ namespace PublicationsAPI.Repositories {
         public async Task<Publications> GetPublicationAsync(string Uuid)
         {
             return await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
-           /* Publications? publication = await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
-
-            if(publication == null)
-                return null;
-
-            return publication;*/
         }
 
         public async Task<IEnumerable<Publications>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize)

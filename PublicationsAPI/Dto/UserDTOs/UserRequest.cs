@@ -23,6 +23,6 @@ namespace PublicationsAPI.DTO.UserDTOs
 
         //[Required(AllowEmptyStrings = true)]
         //[MaxLength(100)]
-        public string? ImageUrl { get; set; } = string.Empty;
+        //public string? ImageUrl { get; set; } = string.Empty;
 	}
 }
