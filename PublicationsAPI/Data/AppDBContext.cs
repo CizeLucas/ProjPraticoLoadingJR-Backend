@@ -36,7 +36,7 @@ namespace PublicationsAPI.Data
             base.OnModelCreating(builder);
         }
 
-        //public DbSet<Users> Users { get; set; }
+        //public DbSet<Users> Users { get; set; }   // -> it is already on the ASP.NET Core Identity
         public DbSet<Publications> Publications { get; set; }
     }
 

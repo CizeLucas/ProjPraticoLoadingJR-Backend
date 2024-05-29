@@ -1,11 +1,14 @@
-using PublicationsAPI.DTO.Publication;
+using PublicationsAPI.DTO.PublicationDTOs;
 using PublicationsAPI.Helper;
 using PublicationsAPI.Models;
+
+#pragma warning disable //disables warnings on this file
 
 namespace PublicationsAPI.DTO.Mappers
 {
     public static class PublicationsDTOMappers
     {
+/*
         public static PublicationDTO PublicationsToPublicationDTO(this Publications publication)
         {
             return new PublicationDTO
@@ -25,7 +28,7 @@ namespace PublicationsAPI.DTO.Mappers
                 PublicationType = PublicationTypes.getIntValueFromString(publicationDTO.PublicationType),
             };
         }
-
+*/
         public static PublicationResponseDTO PublicationsToPublicationResponseDTO(this Publications publication)
         {
             return new PublicationResponseDTO
@@ -36,22 +39,10 @@ namespace PublicationsAPI.DTO.Mappers
                 PublicationType = PublicationTypes.getStringValueFromInt(publication.PublicationType),
                 ImageURL = publication.ImageURL,
                 CreatedAt = publication.CreatedAt,
-                UpdatedAt = publication.UpdatedAt
+                UpdatedAt = publication.UpdatedAt,
+                AuthorUuid = publication.AuthorUuid
             };
         }
 
-        public static Publications PublicationResponseDTOToPublications(this PublicationResponseDTO publicationRespDTO)
-        {
-            return new Publications
-            {
-                Uuid = publicationRespDTO.Uuid,
-                Title = publicationRespDTO.Title,
-                Description = publicationRespDTO.Description,
-                PublicationType = PublicationTypes.getIntValueFromString(publicationRespDTO.PublicationType),
-                ImageURL = publicationRespDTO.ImageURL,
-                CreatedAt = publicationRespDTO.CreatedAt,
-                UpdatedAt = publicationRespDTO.UpdatedAt
-            };
-        } 
     }
 }

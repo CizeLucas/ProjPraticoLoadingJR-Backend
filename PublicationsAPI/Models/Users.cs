@@ -1,17 +1,17 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
-//[Required]
-//[StringLength(36, MinimumLength = 36, ErrorMessage = "The UUID must have a exact lenght of 36 characters")]
+
 namespace PublicationsAPI.Models
 {
+    /*
+    *   Users have all those properties below, but the ones that are commented mean 
+    *   that they do not come from here, but from the IdentityUser ASP.NET Core class
+    */
 	public class Users : IdentityUser<int>
 	{
         //[Key]
         //public int Id { get; set; }
+
         [Required]
         [StringLength(36, MinimumLength = 36, ErrorMessage = "The UUID must have a exact lenght of 36 characters")]
 		public string Uuid { get; set; }
@@ -33,15 +33,10 @@ namespace PublicationsAPI.Models
         //public string Email { get; set; } = string.Empty;
 
         [Required(AllowEmptyStrings = true)]
-        //[MaxLength(100)]
         public string? ImageUrl { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; }
-
-        //[Required]
-        //[MaxLength(100)]
-        //public string PasswordHash { get; set; } = string.Empty;
 
         //  ONE-TO-MANY DB relationship
         public ICollection<Publications>? UserPublications { get; set; }

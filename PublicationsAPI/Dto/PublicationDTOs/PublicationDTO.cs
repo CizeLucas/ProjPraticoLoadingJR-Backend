@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PublicationsAPI.DTO.Publication
+#pragma warning disable //disables warnings on this file
+
+namespace PublicationsAPI.DTO.PublicationDTOs
 {
 	public class PublicationDTO
 	{

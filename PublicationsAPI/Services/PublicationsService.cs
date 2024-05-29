@@ -1,10 +1,8 @@
 using PublicationsAPI.DTO.Mappers;
-using PublicationsAPI.DTO.Publication;
+using PublicationsAPI.DTO.PublicationDTOs;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 using PublicationsAPI.Helper;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Mvc;
 
 namespace PublicationsAPI.Services {
     public class PublicationsService : IPublicationsService
@@ -62,6 +60,13 @@ namespace PublicationsAPI.Services {
             return publication.PublicationsToPublicationResponseDTO();
         }
 
+        public async Task<IEnumerable<PublicationResponseDTO>> GetPublicationAsync()
+        {
+            int numberOfPublicationsToReturn = 12;
+            var latestPublications = await _publicationsRepository.GetLatestPublicationsAsync(numberOfPublicationsToReturn);
+
+            return latestPublications.Select(p => p.PublicationsToPublicationResponseDTO());
+        }
         public async Task<IEnumerable<PublicationResponseDTO>> GetPublicationsFromUserAsync(string publisherUuid)
         {   
             var userPublications = await _usersServices.GetPublicationsByUserUuidService(publisherUuid);

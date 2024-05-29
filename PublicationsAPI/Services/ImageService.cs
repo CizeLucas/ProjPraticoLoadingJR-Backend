@@ -96,16 +96,16 @@ namespace PublicationsAPI.Services {
 
         private string FormatFileName(string originalFileName)
         {
-            // Remover caracteres especiais, exceto hífens, underlines e pontos
+            // Removes special characters, except hyphens, underscores and periods from the image name
             var cleanedFileName = Regex.Replace(originalFileName, @"[^a-zA-Z0-9\-_\.]", "");
 
-            // Substituir espaços por underlines
+            // Replace spaces with underscores
             cleanedFileName = cleanedFileName.Replace(" ", "_");
 
-            // Adicionar um GUID ao nome do arquivo para garantir unicidade
+            // Adds a GUID to the beggining of the file name to ensure uniqueness
             var uniqueFileName = $"{Guid.NewGuid()}_{cleanedFileName}";
 
-            // Limitar o comprimento do nome do arquivo (opcional)
+            // Limits file name length
             if (uniqueFileName.Length > 255)
             {
                 uniqueFileName = uniqueFileName.Substring(0, 255);

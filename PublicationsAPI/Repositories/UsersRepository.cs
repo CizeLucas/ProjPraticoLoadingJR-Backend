@@ -21,7 +21,6 @@ namespace PublicationsAPI.Repositories
 			_context = context;
 			_userManager = userManager;
 		}
-
 		
         public async Task<IEnumerable<Users>> GetAllAsync()
         {
@@ -49,77 +48,6 @@ namespace PublicationsAPI.Repositories
         {
             return await _context.Users.Include(u => u.UserPublications).FirstOrDefaultAsync(u => u.Uuid == userUuid);
         }
-
 		
-/*
-		public async Task<Users>? AddUserAsync(UserRequest userToCreate, string uuid)
-        {
-			if(userToCreate == null)
-				return null;
-
-			Users? user = await _userManager.FindByIdAsync(uuid);
-
-			if(user == null)
-				return null;
-
-			user.Name = userToCreate.Name;
-			user.UserName = userToCreate.UserName;
-			user.Bio = userToCreate.Bio;
-			user.ImageUrl = userToCreate.ImageUrl;
-
-			var createResult = await _userManager.UpdateAsync(user);
-            
-			if (!createResult.Succeeded)
-			{
-				var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-				throw new Exception($"Failed to update user: {errors}");
-			}
-
-			return user; //await _userManager.FindByIdAsync(uuid);
-        }
-
-		public async Task<Users>? UpdateUserAsync(UserRequest updatedUser, string userUuid)
-        {
-            Users? user = await _userManager.FindByIdAsync(userUuid);
-
-			if (user == null)
-				return null;
-
-			user.Name = updatedUser.Name;
-			user.UserName = updatedUser.UserName;
-			user.Bio = updatedUser.Bio;
-			user.ImageUrl = updatedUser.ImageUrl;
-
-			var updateResult = await _userManager.UpdateAsync(user);
-
-			if (!updateResult.Succeeded)
-			{
-				var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-				throw new Exception($"Failed to update user: {errors}");
-			}
-			
-			return user;
-        }
-
-
-		public async Task<bool> DeleteUserAsync(string uuid)
-        {
-            Users? user = await _userManager.FindByIdAsync(uuid);
-
-			if(user == null)
-				return false;
-			
-			var deleteResult = await _userManager.DeleteAsync(user);
-			
-			if (!deleteResult.Succeeded)
-			{
-				var errors = string.Join(", ", deleteResult.Errors.Select(e => e.Description));
-				throw new Exception($"Failed to update user: {errors}");
-			}
-
-			return deleteResult.Succeeded;
-        }
-
-*/
     }
 }

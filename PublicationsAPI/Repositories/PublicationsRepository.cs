@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PublicationsAPI.Data;
-using PublicationsAPI.DTO.Publication;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 
@@ -58,6 +56,11 @@ namespace PublicationsAPI.Repositories {
         public async Task<Publications> GetPublicationAsync(string Uuid)
         {
             return await _context.Publications.FirstOrDefaultAsync(p => p.Uuid == Uuid);
+        }
+
+        public async Task<IEnumerable<Publications>> GetLatestPublicationsAsync(int pageSize)
+        {
+            return await (_context.Publications.OrderByDescending(p => p.Id).Take(pageSize)).ToListAsync();
         }
 
         public async Task<IEnumerable<Publications>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize)

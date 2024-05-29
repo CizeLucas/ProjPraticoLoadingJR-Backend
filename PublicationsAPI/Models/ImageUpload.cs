@@ -1,7 +1,7 @@
 namespace PublicationsAPI.Models
 {
-public class ImageUploadModel
-{
-    public IFormFile? Image { get; set; }
-}
+    public class ImageUploadModel
+    {
+        public IFormFile? Image { get; set; }
+    }
 }

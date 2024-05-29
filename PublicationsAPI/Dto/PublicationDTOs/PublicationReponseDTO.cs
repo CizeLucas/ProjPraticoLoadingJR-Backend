@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using PublicationsAPI.Models;
 
-namespace PublicationsAPI.DTO.Publication
+#pragma warning disable //disables warnings on this file
+
+namespace PublicationsAPI.DTO.PublicationDTOs
 {
 	public class PublicationResponseDTO
 	{
@@ -26,7 +27,11 @@ namespace PublicationsAPI.DTO.Publication
         public DateTime CreatedAt { get; set; } //Date of the creation of the publication
 
         [Required]
-        public DateTime UpdatedAt { get; set; } //Date of the lastest update of the publication
+        public DateTime UpdatedAt { get; set; } //Date of the lastest update of the publication]
+
+        [Required]
+        [StringLength(36, MinimumLength = 36, ErrorMessage = "The UUID must have a exact lenght of 36 characters")]
+        public string? AuthorUuid { get; set; } //Foreing Key
 
 	}
 }

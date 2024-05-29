@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PublicationsAPI.DTO.Mappers;
+
 using PublicationsAPI.DTO.UserDTOs;
 using PublicationsAPI.Extensions;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using PublicationsAPI.DTO.AccountDto;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace PublicationsAPI.Controllers
 {
@@ -54,22 +49,9 @@ namespace PublicationsAPI.Controllers
             return Ok(user);
         }
 
-        [HttpGet("getall")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<List<LoggedOutUserResponse>>> GetAll() {
-            var users = await _usersServices.GetAllUsersService();
-
-            if(!users.Any()) 
-                return NoContent();
-
-            return Ok(users);
-        }
-
-        [Authorize]
-        [HttpGet("where")]
-        public async Task<ActionResult<LoggedInUserResponse>> GetPublicationsPaginated([FromQuery(Name = "p")] int page, [FromQuery(Name = "ps")] int pageSize)
+        [HttpGet("/where")]
+        public async Task<ActionResult<LoggedInUserResponse>> GetUsersPaginated([FromQuery(Name = "p")] int page, [FromQuery(Name = "ps")] int pageSize)
         {
             return Ok(await _usersServices.GetUsersPaginatedService(page, pageSize));
         }

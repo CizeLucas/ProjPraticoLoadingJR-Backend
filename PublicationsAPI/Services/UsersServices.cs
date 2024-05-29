@@ -43,7 +43,7 @@ namespace PublicationsAPI.Services {
         {
             var users = await _usersRepository.GetAllAsync();
 
-            if(users == null || users.Any())
+            if( ! (users == null || users.Any()) )
                 throw new Exception("UserServices Class: There is no user registered in the Database!");
 
             return users.Select(user => user.UsersToLoggedOutUser());

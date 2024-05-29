@@ -13,6 +13,7 @@ namespace PublicationsAPI.Services {
         {
             _userManager = userManager;
         }
+        
         public Users RegisterUser(RegisterDto registerDto){
             return new Users
                 {

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 using PublicationsAPI.Models;
 using PublicationsAPI.DTO.AccountDto;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.DTO.Mappers;
-using PublicationsAPI.DTO.UserDTOs;
-using Microsoft.EntityFrameworkCore;
 
 namespace PublicationsAPI.Controllers
 {
@@ -26,6 +26,9 @@ namespace PublicationsAPI.Controllers
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             try {
@@ -62,6 +65,9 @@ namespace PublicationsAPI.Controllers
 
 
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login ([FromBody] LoginDto loginDto) {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);

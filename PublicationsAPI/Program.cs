@@ -55,7 +55,7 @@ namespace PublicationsAPI
             });
             
             builder.Services.AddDbContext<AppDBContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
             });
             
             builder.Services.AddIdentity<Users, ApplicationRole>(options => {
@@ -117,7 +117,7 @@ namespace PublicationsAPI
             builder.Services.AddScoped<IPublicationsService, PublicationsService>();
             builder.Services.AddScoped<IImageService, ImageService>();
 
-
+            //Configures AWS SDK for S3 Services (image uploads)
             var awsOptions = builder.Configuration.GetAWSOptions();
             builder.Services.AddDefaultAWSOptions(awsOptions);
             builder.Services.AddAWSService<IAmazonS3>();

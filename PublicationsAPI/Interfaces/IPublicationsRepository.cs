@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PublicationsAPI.DTO.Publication;
 using PublicationsAPI.Models;
 
 namespace PublicationsAPI.Interfaces
@@ -11,6 +8,8 @@ namespace PublicationsAPI.Interfaces
 
         public Task<Publications> GetPublicationAsync(string Uuid);
 
+        public Task<IEnumerable<Publications>> GetLatestPublicationsAsync(int pageSize);
+
         public Task<IEnumerable<Publications>> GetPublicationsPaginatedAsync(string publisherUuid, int page, int pageSize);
 
         public Task<Publications> AddPublicationAsync(Publications publication);
@@ -18,7 +17,6 @@ namespace PublicationsAPI.Interfaces
         public Task<Publications> UpdatePublicationAsync(Publications publication);
 
         public Task<bool> DeletePublicationAsync(string Uuid);
-
 
     }
 }

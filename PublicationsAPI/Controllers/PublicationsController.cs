@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PublicationsAPI.DTO.Publication;
+
+using PublicationsAPI.DTO.PublicationDTOs;
 using PublicationsAPI.Extensions;
 using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
@@ -21,6 +22,9 @@ namespace PublicationsAPI.Controllers
         }
         
         [HttpGet("{publicationUuid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PublicationResponseDTO>> GetPublication([FromRoute] string publicationUuid)
         {
             var publication = await _publicationsService.GetPublicationAsync(publicationUuid);
@@ -31,8 +35,23 @@ namespace PublicationsAPI.Controllers
             return Ok(publication);
         }
 
+        [HttpGet("latest")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PublicationResponseDTO>> GetLatestPublications()
+        {
+            var latestPublications = await _publicationsService.GetPublicationAsync();
+
+            return Ok(latestPublications);
+        }
+
         [Authorize]
         [HttpGet("where")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PublicationResponseDTO>> GetPublicationsPaginated([FromQuery(Name = "p")] int page, [FromQuery(Name = "ps")] int pageSize)
         {
             string? userUuid = User.GetUuid();
@@ -45,6 +64,10 @@ namespace PublicationsAPI.Controllers
 
         [Authorize]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PublicationResponseDTO>> GetPublicationsFromUser()
         {
             string? userUuid = User.GetUuid();
@@ -60,6 +83,10 @@ namespace PublicationsAPI.Controllers
 
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PublicationResponseDTO>> CreatePublication(
             [FromForm] PublicationDTO publicationDto, [FromForm] ImageUploadModel image
         ) {
@@ -76,6 +103,10 @@ namespace PublicationsAPI.Controllers
 
         [Authorize]
         [HttpPut("{publicationUuid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdatePublication(
             [FromRoute] string publicationUuid, [FromForm] PublicationDTO publicationDto, [FromForm] ImageUploadModel image
         ) {
@@ -104,6 +135,10 @@ namespace PublicationsAPI.Controllers
 
         [Authorize]
         [HttpDelete("{publicationUuid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeletePublication([FromRoute] string publicationUuid)
         {
             string? userUuid = User.GetUuid();

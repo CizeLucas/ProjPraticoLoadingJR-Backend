@@ -9,7 +9,6 @@ using System.Text;
 namespace PublicationsAPI.Services {
     public class TokenService : ITokenService
     {
-
         private readonly IConfiguration _config;
         private readonly SymmetricSecurityKey _key;
         public readonly int expirationTimeInMinutes;
@@ -23,7 +22,6 @@ namespace PublicationsAPI.Services {
         public string CreateToken(Users user)
         {
             var claims = new List<Claim>{
-                //new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
                 new Claim("uuid", user.Uuid)
             };
@@ -50,10 +48,6 @@ namespace PublicationsAPI.Services {
         public int GetExpirationTimeInMinutes()
         {
             return expirationTimeInMinutes;
-        }
-
-        public string GetUuidClaim() {
-            return "";
         }
     }
 }
