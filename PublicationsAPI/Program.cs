@@ -55,7 +55,7 @@ namespace PublicationsAPI
             });
             
             builder.Services.AddDbContext<AppDBContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
             
             builder.Services.AddIdentity<Users, ApplicationRole>(options => {
@@ -111,7 +111,7 @@ namespace PublicationsAPI
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
             builder.Services.AddScoped<IPublicationsRepository, PublicationsRepository>();
 
-            builder.Services.AddScoped<IUsersServices, UsersServices>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IAccountsService, AccountsService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IPublicationsService, PublicationsService>();

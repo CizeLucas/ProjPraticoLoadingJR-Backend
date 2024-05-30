@@ -6,12 +6,12 @@ using PublicationsAPI.Interfaces;
 using PublicationsAPI.Models;
 
 namespace PublicationsAPI.Services {
-    public class UsersServices : IUsersServices
+    public class UsersService : IUsersService
     {
         private readonly IUsersRepository _usersRepository;
         private readonly UserManager<Users> _userManager;
         private readonly IImageService _imageService;
-        public UsersServices(IUsersRepository usersRepository, UserManager<Users> userManager, IImageService imageService)
+        public UsersService(IUsersRepository usersRepository, UserManager<Users> userManager, IImageService imageService)
         {
             _usersRepository = usersRepository;
             _userManager = userManager;

@@ -12,9 +12,9 @@ namespace PublicationsAPI.Controllers
     [Route("api/user")]
     public class UsersController : ControllerBase
     {
-        private readonly IUsersServices _usersServices;
+        private readonly IUsersService _usersServices;
         private readonly IImageService _imageService;
-        public UsersController(IUsersServices usersServices, IImageService imageService)
+        public UsersController(IUsersService usersServices, IImageService imageService)
         {
             _usersServices = usersServices;
             _imageService = imageService;

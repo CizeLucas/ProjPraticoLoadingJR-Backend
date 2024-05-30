@@ -4,7 +4,7 @@ using PublicationsAPI.DTO.UserDTOs;
 
 namespace PublicationsAPI.Interfaces
 {
-    public interface IUsersServices
+    public interface IUsersService
     {
         public Task<IEnumerable<Publications>> GetPublicationsByUserUuidService(string userUuid);
 

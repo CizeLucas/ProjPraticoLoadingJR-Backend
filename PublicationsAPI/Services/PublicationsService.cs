@@ -9,9 +9,9 @@ namespace PublicationsAPI.Services {
     {
 
         private readonly IPublicationsRepository _publicationsRepository;
-        private readonly IUsersServices _usersServices;
+        private readonly IUsersService _usersServices;
         private readonly IImageService _imageService;
-        public PublicationsService(IPublicationsRepository publicationsRepository, IUsersServices usersServices, IImageService imageService)
+        public PublicationsService(IPublicationsRepository publicationsRepository, IUsersService usersServices, IImageService imageService)
         {
             _publicationsRepository = publicationsRepository;
             _usersServices = usersServices;
